@@ -3,13 +3,11 @@ package Tproject.controller;
 import Tproject.dto.TaskCreateDto;
 import Tproject.dto.TaskDto;
 import Tproject.mapper.TaskMapper;
-import Tproject.model.Task;
-import Tproject.repository.TaskRepository;
+import Tproject.service.TaskService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -17,32 +15,31 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class TaskController {
-    private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
+    private final TaskService taskService;
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDto> getById(@PathVariable Long id){
-        return ResponseEntity.ok(taskMapper.toDto(taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользоотваель не найден"))));
+        return ResponseEntity.ok(taskMapper.toDto(taskService.getById(id)));
     }
-    @GetMapping("/all")
-    public ResponseEntity<List<TaskDto>> getAll(){
-        return ResponseEntity.ok(taskMapper.toListDto(taskRepository.findAll()));
+    @GetMapping("/my")
+    public ResponseEntity<List<TaskDto>> getMy(HttpServletRequest request){
+        return ResponseEntity.ok(taskMapper.toListDto(taskService.getTasksByRequest(request)));
     }
     @PostMapping("/create")
-    public ResponseEntity<TaskDto> create(@RequestBody TaskCreateDto createDto){
-        return null;
+    public ResponseEntity<TaskDto> create(@RequestBody TaskCreateDto createDto,HttpServletRequest request){
+        return ResponseEntity.ok(taskMapper.toDto(taskService.create(createDto,request)));
     }
     @PostMapping("/update/{taskId}")
     public ResponseEntity<TaskDto> update(@RequestBody TaskCreateDto createDto,@PathVariable Long taskId){
-        return null;
+        return ResponseEntity.ok(taskMapper.toDto(taskService.update(taskId,createDto)));
     }
     @PostMapping("/change-status/{taskId}")
     public ResponseEntity<TaskDto> changeStatus(@RequestBody boolean isDone, @PathVariable Long taskId){
-        return null;
+        return ResponseEntity.ok(taskMapper.toDto(taskService.changeStatus(taskId,isDone)));
     }
     @DeleteMapping("/delete/{taskId}")
     public ResponseEntity<String> delete(@PathVariable Long taskId){
-        return null;
+        return ResponseEntity.ok(taskService.deleteTask(taskId));
     }
 }
