@@ -11,11 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService{
     private final TaskRepository taskRepository;
