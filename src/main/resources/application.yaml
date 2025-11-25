@@ -1,0 +1,17 @@
+jwt:
+  secret: auhsdfuihpauisdfuhasiudhfuiasuiefjasndjgfbzkxclb/xm;dtjhyiodrtfhjknxdklfgjuiawergfuhasbfdfliughasyurgbhsjzrdgfhiuoshdufgisiarutghstyuerdghjksdfngjseruiygbsjdkfbgnjksdxbfjkgbserbghjdfj
+  expiration: 3600000
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/TodoTest
+    username: postgres
+    password: 80085
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
