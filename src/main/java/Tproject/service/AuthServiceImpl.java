@@ -44,6 +44,7 @@ public class AuthServiceImpl implements AuthService{
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
         String newRefreshToken = RefreshTokenUtil.generateRefreshToken();
         user.setRefreshToken(newRefreshToken);
+        userRepository.save(user);
         String jwtToken = jwtUtil.generateToken(userDetailsService.loadUserByUsername(user.getUsername()));
         JwtDto dto = new JwtDto();
         dto.setRefreshToken(refreshToken);

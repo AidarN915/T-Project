@@ -77,7 +77,7 @@ public class AuthController {
         return ResponseEntity.ok("Ок");
     }
     @PostMapping("/refresh")
-    public ResponseEntity<JwtDto> refresh(@RequestParam("inn") String refreshToken){
+    public ResponseEntity<JwtDto> refresh(@RequestParam("refreshToken") String refreshToken){
         JwtDto dto = authService.refresh(refreshToken);
         return ResponseEntity.ok(dto);
     }
