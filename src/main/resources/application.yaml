@@ -1,12 +1,13 @@
 jwt:
   secret: auhsdfuihpauisdfuhasiudhfuiasuiefjasndjgfbzkxclb/xm;dtjhyiodrtfhjknxdklfgjuiawergfuhasbfdfliughasyurgbhsjzrdgfhiuoshdufgisiarutghstyuerdghjksdfngjseruiygbsjdkfbgnjksdxbfjkgbserbghjdfj
+  rtExpirationDays: 14
   expiration: 3600000
 
 spring:
   datasource:
-    url: jdbc:postgresql://postgres.railway.internal:5432/railway
+    url: jdbc:postgresql://postgres.railway.internal:5432/railway #jdbc:postgresql://localhost:5432/TodoTest #jdbc:postgresql://postgres.railway.internal:5432/railway
     username: postgres
-    password: EECtbJuEldITiIfBBEIddigCmfvYutJf
+    password: EECtbJuEldITiIfBBEIddigCmfvYutJf #80085 #EECtbJuEldITiIfBBEIddigCmfvYutJf
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

@@ -25,55 +25,23 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    private final UserDetailsServiceImpl userDetailsService;
-    private final JwtUtil jwtUtil;
-    private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtDto> login(@RequestBody AuthDto authDto){
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authDto.getUsername(),
-                authDto.getPassword()
-        ));
-        UserDetails userDetails = userDetailsService.loadUserByUsername(authDto.getUsername());
-        String refreshToken = RefreshTokenUtil.generateRefreshToken();
-        String token = jwtUtil.generateToken(userDetails);
+        return ResponseEntity.ok(authService.login(authDto));
 
-        authService.setRefreshToken(authDto.getUsername(), refreshToken);
-
-        JwtDto jwt = new JwtDto();
-        jwt.setRefreshToken(refreshToken);
-        jwt.setToken(token);
-        return ResponseEntity.ok(jwt);
     }
 
     @PostMapping("/register")
     public ResponseEntity<UserDto> register(@RequestBody AuthDto user) {
-        Tproject.model.User newUser = new User();
-        newUser.setUsername(user.getUsername());
-        newUser.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(newUser);
-        UserDto dto = userMapper.toDto(newUser);
-        return ResponseEntity.ok(userMapper.toDto(newUser));
+        return ResponseEntity.ok(userMapper.toDto(authService.create(user)));
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-
-        String token = authHeader.substring(7);
-
-        String username = jwtUtil.extractUsername(token);
-
-        authService.logout(username);
-
+        authService.logout(request);
         return ResponseEntity.ok("Ок");
     }
     @PostMapping("/refresh")

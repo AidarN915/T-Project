@@ -27,9 +27,7 @@ public class TaskServiceImpl implements TaskService{
     @Override
     public Task create(TaskCreateDto createDto,HttpServletRequest request) {
         Task newTask = new Task();
-        newTask.setCreated(LocalDateTime.now());
         newTask.setCreator(userUtil.getUserByRequest(request));
-        newTask.setDone(false);
         newTask.setExecutor(userRepository.findByUsername(createDto.getExecutor().getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
         newTask.setDeadline(createDto.getDeadline());
@@ -49,7 +47,7 @@ public class TaskServiceImpl implements TaskService{
     @Override
     public Task update(Long id, TaskCreateDto createDto) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
         task.setTitle(createDto.getTitle());
         task.setDescription(createDto.getDescription());
         task.setDeadline(createDto.getDeadline());

@@ -27,7 +27,6 @@ public class SwaggerConfig {
                                         .bearerFormat("JWT")
                         )
                 )
-                // добавляем сервер с HTTPS
                 .addServersItem(new Server().url("https://t-project-production.up.railway.app"));
     }
 }

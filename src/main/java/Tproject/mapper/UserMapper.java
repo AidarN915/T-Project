@@ -5,6 +5,6 @@ import Tproject.model.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface UserMapper {
-    public UserDto toDto(User user);
+public abstract class UserMapper {
+    public abstract UserDto toDto(User user);
 }
