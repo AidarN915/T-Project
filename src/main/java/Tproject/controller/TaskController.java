@@ -24,24 +24,30 @@ public class TaskController {
     public ResponseEntity<TaskDto> getById(@PathVariable Long id){
         return ResponseEntity.ok(taskMapper.toDto(taskService.getById(id)));
     }
-    @GetMapping("/my")
-    public ResponseEntity<List<TaskDto>> getMy(HttpServletRequest request){
-        return ResponseEntity.ok(taskMapper.toListDto(taskService.getTasksByRequest(request)));
+    @GetMapping("/{taskListId}/all")
+    public ResponseEntity<List<TaskDto>> getMy(@PathVariable Long taskListId){
+        return ResponseEntity.ok(taskMapper.toListDto(taskService.getByTaskListId(taskListId)));
     }
-    @PostMapping("/create")
-    public ResponseEntity<TaskDto> create(@RequestBody TaskCreateDto createDto,HttpServletRequest request){
-        return ResponseEntity.ok(taskMapper.toDto(taskService.create(createDto,request)));
+    @PostMapping("/{taskListId}/create")
+    public ResponseEntity<TaskDto> create(@PathVariable Long taskListId,
+                                          @RequestBody TaskCreateDto createDto,
+                                          HttpServletRequest request){
+        return ResponseEntity.ok(taskMapper.toDto(taskService.create(taskListId,createDto,request)));
     }
     @PostMapping("/update/{taskId}")
-    public ResponseEntity<TaskDto> update(@RequestBody TaskCreateDto createDto,@PathVariable Long taskId){
-        return ResponseEntity.ok(taskMapper.toDto(taskService.update(taskId,createDto)));
+    public ResponseEntity<TaskDto> update(HttpServletRequest request,
+                                        @RequestBody TaskCreateDto createDto,
+                                        @PathVariable Long taskId){
+        return ResponseEntity.ok(taskMapper.toDto(taskService.update(taskId,createDto,request)));
     }
     @PostMapping("/change-status/{taskId}")
-    public ResponseEntity<TaskDto> changeStatus(@RequestBody boolean isDone, @PathVariable Long taskId){
-        return ResponseEntity.ok(taskMapper.toDto(taskService.changeStatus(taskId,isDone)));
+    public ResponseEntity<TaskDto> changeStatus(@RequestBody boolean isDone,
+                                                @PathVariable Long taskId,
+                                                HttpServletRequest request){
+        return ResponseEntity.ok(taskMapper.toDto(taskService.changeStatus(taskId,isDone,request)));
     }
     @DeleteMapping("/delete/{taskId}")
-    public ResponseEntity<String> delete(@PathVariable Long taskId){
-        return ResponseEntity.ok(taskService.deleteTask(taskId));
+    public ResponseEntity<String> delete(@PathVariable Long taskId,HttpServletRequest request){
+        return ResponseEntity.ok(taskService.deleteTask(taskId,request));
     }
 }

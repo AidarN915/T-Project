@@ -27,8 +27,6 @@ public class User {
     private String refreshToken;
     private LocalDateTime refreshTokenExpires;
 
-    @OneToMany(mappedBy = "executor")
-    private List<Task> tasks;
-    @OneToMany(mappedBy = "creator")
-    private List<Task> createdTasks;
+    @OneToMany(mappedBy = "user")
+    private List<TaskList> lists;
 }

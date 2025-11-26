@@ -13,6 +13,5 @@ public class TaskDto {
     private LocalDateTime created;
     private LocalDateTime deadline;
     private boolean isDone;
-    private UserDto executor;
-    private UserDto creator;
+    private TaskListDto taskList;
 }
