@@ -1,9 +1,11 @@
 package Tproject.service.Impl;
 
 import Tproject.model.Board;
+import Tproject.model.Project;
 import Tproject.model.TaskList;
 import Tproject.model.User;
 import Tproject.repository.BoardRepository;
+import Tproject.repository.ProjectRepository;
 import Tproject.repository.TaskListRepository;
 import Tproject.service.TaskListService;
 import Tproject.util.UserUtil;
@@ -22,6 +24,7 @@ public class TaskListServiceImpl implements TaskListService {
     private final TaskListRepository taskListRepository;
     private final UserUtil userUtil;
     private final BoardRepository boardRepository;
+    private final ProjectRepository projectRepository;
     @Override
     public TaskList create(Long boardId,String title, HttpServletRequest request) {
         TaskList newList = new TaskList();
@@ -46,18 +49,22 @@ public class TaskListServiceImpl implements TaskListService {
 
     @Override
     public List<TaskList> all(HttpServletRequest request) {
-        /*User user = userUtil.getUserByRequest(request);
-        List<TaskList> listsFromProjects = user.getProjects().stream()
+        User user = userUtil.getUserByRequest(request);
+        /*List<TaskList> listsFromProjects = user.getProjects().stream()
                 .flatMap(project -> project.getBoards().stream())
                 .flatMap(board -> board.getTaskLists().stream())
-                .toList();
-
+                .toList();*/
+        List<TaskList> listsFromProjects = new ArrayList<TaskList>();
+        for(Project project:projectRepository.getByUsers(user)){
+            for(Board board:project.getBoards()){
+                listsFromProjects.addAll(board.getTaskLists());
+            }
+        }
         List<TaskList> orphanLists = taskListRepository.findByOwner(user);
 
         List<TaskList> allLists = new ArrayList<>(listsFromProjects);
         allLists.addAll(orphanLists);
-        return allLists;*/
-        return null;
+        return allLists;
     }
 
     @Override
