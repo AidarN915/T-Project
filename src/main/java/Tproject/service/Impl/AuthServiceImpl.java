@@ -1,9 +1,10 @@
-package Tproject.service;
+package Tproject.service.Impl;
 
 import Tproject.dto.AuthDto;
 import Tproject.dto.JwtDto;
 import Tproject.model.User;
 import Tproject.repository.UserRepository;
+import Tproject.service.AuthService;
 import Tproject.util.JwtUtil;
 import Tproject.util.RefreshTokenUtil;
 import Tproject.util.UserUtil;
@@ -11,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class AuthServiceImpl implements AuthService{
+public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;

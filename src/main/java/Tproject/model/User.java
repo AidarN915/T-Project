@@ -2,13 +2,18 @@ package Tproject.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Data
 @Entity
+@Getter
+@Setter
 @Table(name = "users")
 @ToString(onlyExplicitlyIncluded = true)
 public class User {
@@ -27,6 +32,6 @@ public class User {
     private String refreshToken;
     private LocalDateTime refreshTokenExpires;
 
-    @OneToMany(mappedBy = "user")
-    private List<TaskList> lists;
+    @ManyToMany(mappedBy = "users")
+    private Set<Project> projects = new HashSet<>();
 }

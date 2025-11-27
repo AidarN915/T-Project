@@ -2,15 +2,18 @@ package Tproject.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
-@Table(name = "task_list")
+@Table(name = "boards")
 @ToString(onlyExplicitlyIncluded = true)
-public class TaskList {
+public class Board {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,10 +21,10 @@ public class TaskList {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "list")
-    private List<Task> tasks;
-
     @ManyToOne
-    @JoinColumn(name = "board_id")
-    private Board board;
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    @OneToMany(mappedBy = "board")
+    private List<TaskList> taskLists;
 }

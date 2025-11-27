@@ -1,7 +1,9 @@
-package Tproject.service;
+package Tproject.service.Impl;
 
 import Tproject.model.TaskList;
+import Tproject.repository.BoardRepository;
 import Tproject.repository.TaskListRepository;
+import Tproject.service.TaskListService;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -13,28 +15,33 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class TaskListServiceImpl implements TaskListService{
+public class TaskListServiceImpl implements TaskListService {
     private final TaskListRepository taskListRepository;
     private final UserUtil userUtil;
+    private final BoardRepository boardRepository;
     @Override
-    public TaskList create(String title, HttpServletRequest request) {
+    public TaskList create(Long boardId,String title, HttpServletRequest request) {
         TaskList newList = new TaskList();
         newList.setTitle(title);
-        newList.setUser(userUtil.getUserByRequest(request));
+        newList.setBoard(boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена")));
         taskListRepository.save(newList);
         return newList;
     }
 
     @Override
-    public List<TaskList> all(HttpServletRequest request) {
-        return taskListRepository.getByUser(userUtil.getUserByRequest(request));
+    public List<TaskList> all(Long boardId,HttpServletRequest request) {
+        return boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена"))
+                .getTaskLists();
+
     }
 
     @Override
     public TaskList update(String title, Long taskListId, HttpServletRequest request) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
-        if (!taskList.getUser().getId().equals(userUtil.getUserByRequest(request).getId())) {
+        if (!taskList.getBoard().getProject().getUsers().contains(userUtil.getUserByRequest(request))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         if(taskList.getTitle() == title){
@@ -49,7 +56,7 @@ public class TaskListServiceImpl implements TaskListService{
     public String delete(Long taskListId, HttpServletRequest request) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        if (!taskList.getUser().getId().equals(userUtil.getUserByRequest(request).getId())) {
+        if (!taskList.getBoard().getProject().getUsers().contains(userUtil.getUserByRequest(request))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         taskListRepository.delete(taskList);

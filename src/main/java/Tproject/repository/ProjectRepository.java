@@ -1,0 +1,11 @@
+package Tproject.repository;
+
+import Tproject.model.Project;
+import Tproject.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
+
+public interface ProjectRepository extends JpaRepository<Project,Long> {
+    public List<Project> getByUsers(User user);
+}

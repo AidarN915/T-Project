@@ -1,13 +1,12 @@
 package Tproject.dto;
 
-import Tproject.model.Task;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class TaskListDto {
+public class BoardDto {
     private Long id;
     private String title;
-    private List<TaskDto> tasks;
+    private List<TaskListDto> taskLists;
 }

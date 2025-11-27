@@ -21,6 +21,12 @@ public class Task {
     private LocalDateTime deadline;
     private boolean isDone = false;
     @ManyToOne
+    @JoinColumn(name = "executor_id")
+    private User executor;
+    @ManyToOne
+    @JoinColumn(name = "creator_id")
+    private User creator;
+    @ManyToOne
     @JoinColumn(name = "list_id")
     private TaskList list;
 }

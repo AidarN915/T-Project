@@ -11,4 +11,5 @@ public class TaskCreateDto {
     private String title;
     private String description;
     private LocalDateTime deadline;
+    private UserDto executor;
 }

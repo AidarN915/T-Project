@@ -17,15 +17,17 @@ public class TaskListController {
     private final TaskListService taskListService;
     private final TaskListMapper taskListMapper;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<TaskListDto>> getMyLists(HttpServletRequest request){
-        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(request)));
+    @GetMapping("/{boardId}/all")
+    public ResponseEntity<List<TaskListDto>> getMyLists(@PathVariable Long boardId,
+                                                        HttpServletRequest request){
+        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(boardId,request)));
     }
 
-    @PostMapping("/create")
-    public ResponseEntity<TaskListDto> create(HttpServletRequest request,
+    @PostMapping("/create/{boardId}")
+    public ResponseEntity<TaskListDto> create(@PathVariable Long boardId,
+                                              HttpServletRequest request,
                                               @RequestParam("title") String title){
-        return ResponseEntity.ok(taskListMapper.toDto(taskListService.create(title,request)));
+        return ResponseEntity.ok(taskListMapper.toDto(taskListService.create(boardId,title,request)));
     }
 
     @PostMapping("/update/{taskListId}")

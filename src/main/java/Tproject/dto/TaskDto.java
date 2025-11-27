@@ -14,4 +14,6 @@ public class TaskDto {
     private LocalDateTime deadline;
     private boolean isDone;
     private TaskListDto taskList;
+    private UserDto executor;
+    private UserDto creator;
 }
