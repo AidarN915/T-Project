@@ -46,7 +46,7 @@ public class TaskListServiceImpl implements TaskListService {
 
     @Override
     public List<TaskList> all(HttpServletRequest request) {
-        User user = userUtil.getUserByRequest(request);
+        /*User user = userUtil.getUserByRequest(request);
         List<TaskList> listsFromProjects = user.getProjects().stream()
                 .flatMap(project -> project.getBoards().stream())
                 .flatMap(board -> board.getTaskLists().stream())
@@ -56,7 +56,8 @@ public class TaskListServiceImpl implements TaskListService {
 
         List<TaskList> allLists = new ArrayList<>(listsFromProjects);
         allLists.addAll(orphanLists);
-        return allLists;
+        return allLists;*/
+        return null;
     }
 
     @Override
