@@ -31,12 +31,18 @@ public class TaskServiceImpl implements TaskService {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
         User user = userUtil.getUserByRequest(request);
-        if (!taskList.getBoard().getProject().getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if(taskList.getBoard() != null) {
+            if (!taskList.getBoard().getProject().getUsers().contains(user)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }else if(taskList.getOwner() != null){
+            if(taskList.getOwner() != user){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
         }
 
         Task newTask = new Task();
-        newTask.setList(taskList);
+        newTask.setTaskList(taskList);
         newTask.setExecutor(userRepository.findByUsername(createDto.getExecutor().getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Исполнитель не найден")));
         newTask.setCreator(user);
@@ -61,8 +67,14 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
         User user = userUtil.getUserByRequest(request);
-        if (!task.getList().getBoard().getProject().getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if(task.getTaskList().getBoard() != null) {
+            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }else if(task.getTaskList().getOwner() != null){
+            if(task.getTaskList().getOwner() != user){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
         }
         User executor = userRepository.findByUsername(createDto.getExecutor().getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Исполнитель не найден"));
@@ -79,8 +91,14 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
         User user = userUtil.getUserByRequest(request);
-        if (!task.getList().getBoard().getProject().getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if(task.getTaskList().getBoard() != null) {
+            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }else if(task.getTaskList().getOwner() != null){
+            if(task.getTaskList().getOwner() != user){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
         }
 
         if(task.isDone() == isDone){
@@ -96,8 +114,14 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
         User user = userUtil.getUserByRequest(request);
-        if (!task.getList().getBoard().getProject().getUsers().contains(user)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        if(task.getTaskList().getBoard() != null) {
+            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+        }else if(task.getTaskList().getOwner() != null){
+            if(task.getTaskList().getOwner() != user){
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
         }
 
         taskRepository.delete(task);

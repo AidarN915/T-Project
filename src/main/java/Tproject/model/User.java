@@ -34,4 +34,7 @@ public class User {
 
     @ManyToMany(mappedBy = "users")
     private Set<Project> projects = new HashSet<>();
+
+    @OneToMany(mappedBy = "owner")
+    private List<TaskList> taskLists;
 }

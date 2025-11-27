@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TaskListRepository extends JpaRepository<TaskList,Long> {
+    public List<TaskList> findByOwner(User owner);
 }

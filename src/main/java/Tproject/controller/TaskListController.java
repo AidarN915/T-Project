@@ -18,9 +18,14 @@ public class TaskListController {
     private final TaskListMapper taskListMapper;
 
     @GetMapping("/{boardId}/all")
-    public ResponseEntity<List<TaskListDto>> getMyLists(@PathVariable Long boardId,
+    public ResponseEntity<List<TaskListDto>> getByBoardId(@PathVariable Long boardId,
                                                         HttpServletRequest request){
-        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(boardId,request)));
+        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.getByBoardId(boardId,request)));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<TaskListDto>> getAll(HttpServletRequest request){
+        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(request)));
     }
 
     @PostMapping("/create/{boardId}")
@@ -38,7 +43,7 @@ public class TaskListController {
     }
 
     @DeleteMapping("/delete/{taskListId}")
-    public ResponseEntity<String> delete(@PathVariable Long taskListid,HttpServletRequest request){
-        return ResponseEntity.ok(taskListService.delete(taskListid,request));
+    public ResponseEntity<String> delete(@PathVariable Long taskListId,HttpServletRequest request){
+        return ResponseEntity.ok(taskListService.delete(taskListId,request));
     }
 }

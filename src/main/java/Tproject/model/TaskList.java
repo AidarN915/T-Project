@@ -18,10 +18,13 @@ public class TaskList {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "list")
+    @OneToMany(mappedBy = "taskList")
     private List<Task> tasks;
 
     @ManyToOne
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id",nullable = true)
     private Board board;
+    @ManyToOne
+    @JoinColumn(name = "owner_id",nullable = true)
+    private User owner;
 }

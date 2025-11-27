@@ -28,5 +28,5 @@ public class Task {
     private User creator;
     @ManyToOne
     @JoinColumn(name = "list_id")
-    private TaskList list;
+    private TaskList taskList;
 }
