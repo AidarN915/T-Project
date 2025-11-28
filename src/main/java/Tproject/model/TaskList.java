@@ -18,7 +18,7 @@ public class TaskList {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "taskList")
+    @OneToMany(mappedBy = "taskList",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Task> tasks;
 
     @ManyToOne

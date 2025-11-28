@@ -25,6 +25,6 @@ public class Board {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board",cascade = CascadeType.REMOVE)
     private List<TaskList> taskLists;
 }

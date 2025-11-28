@@ -23,7 +23,7 @@ public class Project {
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project",cascade = CascadeType.REMOVE,orphanRemoval = true)
     private List<Board> boards;
 
     @ManyToMany
