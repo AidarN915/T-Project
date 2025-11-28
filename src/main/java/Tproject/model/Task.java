@@ -21,7 +21,7 @@ public class Task {
     private LocalDateTime deadline;
     private boolean isDone = false;
     @ManyToOne
-    @JoinColumn(name = "executor_id")
+    @JoinColumn(name = "executor_id",nullable = true)
     private User executor;
     @ManyToOne
     @JoinColumn(name = "creator_id")

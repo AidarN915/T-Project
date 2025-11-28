@@ -43,8 +43,10 @@ public class TaskServiceImpl implements TaskService {
 
         Task newTask = new Task();
         newTask.setTaskList(taskList);
-        newTask.setExecutor(userRepository.findByUsername(createDto.getExecutor().getUsername())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Исполнитель не найден")));
+        if(createDto.getExecutor() != null) {
+            newTask.setExecutor(userRepository.findByUsername(createDto.getExecutor().getUsername())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден")));
+        }
         newTask.setCreator(user);
         newTask.setDeadline(createDto.getDeadline());
         newTask.setDescription(createDto.getDescription());
