@@ -1,6 +1,7 @@
 package Tproject.controller;
 
 import Tproject.dto.UserDto;
+import Tproject.dto.UserRoleDto;
 import Tproject.mapper.UserMapper;
 import Tproject.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,8 +18,8 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     @GetMapping("/all")
-    public ResponseEntity<List<UserDto>> getAll(){
-        return ResponseEntity.ok(userMapper.toListDto(userService.getAll()));
+    public ResponseEntity<List<UserRoleDto>> getAll(){
+        return ResponseEntity.ok(userMapper.toListRoleDto(userService.getAll()));
     }
 
     @PostMapping("/role")
