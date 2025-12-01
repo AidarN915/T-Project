@@ -7,6 +7,7 @@ import Tproject.service.ProjectService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,27 +20,27 @@ public class ProjectController {
     private final ProjectMapper projectMapper;
 
     @GetMapping("/getAll")
-    public ResponseEntity<List<ProjectDto>> getAll(HttpServletRequest request){
-        return ResponseEntity.ok(projectMapper.toListDto(projectService.getAll(request)));
+    public ResponseEntity<List<ProjectDto>> getAll(Authentication auth){
+        return ResponseEntity.ok(projectMapper.toListDto(projectService.getAll(auth)));
     }
     @GetMapping("/{projectId}")
-    public ResponseEntity<ProjectDto> getById(@PathVariable Long projectId,HttpServletRequest request){
-        return ResponseEntity.ok(projectMapper.toDto(projectService.getById(projectId,request)));
+    public ResponseEntity<ProjectDto> getById(@PathVariable Long projectId,Authentication auth){
+        return ResponseEntity.ok(projectMapper.toDto(projectService.getById(projectId,auth)));
     }
     @PostMapping("/create")
-    public ResponseEntity<ProjectDto> create(HttpServletRequest request,
+    public ResponseEntity<ProjectDto> create(Authentication auth,
                                              @RequestParam("title") String title){
-        return ResponseEntity.ok(projectMapper.toDto(projectService.create(request,title)));
+        return ResponseEntity.ok(projectMapper.toDto(projectService.create(auth,title)));
     }
     @PostMapping("/update/{projectId}")
-    public ResponseEntity<ProjectDto> update(HttpServletRequest request,
+    public ResponseEntity<ProjectDto> update(Authentication auth,
                                              @PathVariable Long projectId,
                                              @RequestBody ProjectUpdateDto updateDto){
-        return ResponseEntity.ok(projectMapper.toDto(projectService.update(projectId,request,updateDto)));
+        return ResponseEntity.ok(projectMapper.toDto(projectService.update(projectId,auth,updateDto)));
     }
     @DeleteMapping("/{projectId}")
     public ResponseEntity<String> delete(@PathVariable Long projectId,
-                                         HttpServletRequest request){
-        return ResponseEntity.ok(projectService.delete(projectId,request));
+                                         Authentication auth){
+        return ResponseEntity.ok(projectService.delete(projectId,auth));
     }
 }

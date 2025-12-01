@@ -8,5 +8,7 @@ import java.util.List;
 @Data
 public class ProjectUpdateDto {
     private String title;
-    private List<UserDto> users;
+    private List<UserDto> viewers;
+    private List<UserDto> executors;
+    private List<UserDto> moderators;
 }

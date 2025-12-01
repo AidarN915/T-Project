@@ -27,8 +27,20 @@ public class Project {
     private List<Board> boards;
 
     @ManyToMany
-    @JoinTable(name = "users_projects",
+    @JoinTable(name = "viewers_projects",
     joinColumns = @JoinColumn(name = "project_id"),
-    inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> users = new HashSet<>();
+    inverseJoinColumns = @JoinColumn(name = "viewer_id"))
+    private Set<User> viewers = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "executors_projects",
+    joinColumns = @JoinColumn(name = "project_id"),
+    inverseJoinColumns = @JoinColumn(name = "executor_id"))
+    private Set<User> executors = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "moderators_projects",
+    joinColumns = @JoinColumn(name = "project_id"),
+    inverseJoinColumns = @JoinColumn(name = "moderator_id"))
+    private Set<User> moderators = new HashSet<>();
 }

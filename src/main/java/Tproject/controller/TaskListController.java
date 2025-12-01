@@ -6,6 +6,7 @@ import Tproject.service.TaskListService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,31 +20,31 @@ public class TaskListController {
 
     @GetMapping("/{boardId}/all")
     public ResponseEntity<List<TaskListDto>> getByBoardId(@PathVariable Long boardId,
-                                                        HttpServletRequest request){
-        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.getByBoardId(boardId,request)));
+                                                        Authentication auth){
+        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.getByBoardId(boardId,auth)));
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<TaskListDto>> getAll(HttpServletRequest request){
-        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(request)));
+    public ResponseEntity<List<TaskListDto>> getAll(Authentication auth){
+        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(auth)));
     }
 
     @PostMapping("/create/{boardId}")
     public ResponseEntity<TaskListDto> create(@PathVariable Long boardId,
-                                              HttpServletRequest request,
+                                              Authentication auth,
                                               @RequestParam("title") String title){
-        return ResponseEntity.ok(taskListMapper.toDto(taskListService.create(boardId,title,request)));
+        return ResponseEntity.ok(taskListMapper.toDto(taskListService.create(boardId,title,auth)));
     }
 
     @PostMapping("/update/{taskListId}")
     public ResponseEntity<TaskListDto> update(@RequestParam("newTitle") String newTitle,
-                                              HttpServletRequest request,
+                                              Authentication auth,
                                               @PathVariable Long taskListId){
-        return ResponseEntity.ok(taskListMapper.toDto(taskListService.update(newTitle,taskListId,request)));
+        return ResponseEntity.ok(taskListMapper.toDto(taskListService.update(newTitle,taskListId,auth)));
     }
 
     @DeleteMapping("/delete/{taskListId}")
-    public ResponseEntity<String> delete(@PathVariable Long taskListId,HttpServletRequest request){
-        return ResponseEntity.ok(taskListService.delete(taskListId,request));
+    public ResponseEntity<String> delete(@PathVariable Long taskListId,Authentication auth){
+        return ResponseEntity.ok(taskListService.delete(taskListId,auth));
     }
 }

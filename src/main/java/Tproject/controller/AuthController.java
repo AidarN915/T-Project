@@ -2,6 +2,7 @@ package Tproject.controller;
 
 import Tproject.dto.AuthDto;
 import Tproject.dto.JwtDto;
+import Tproject.dto.LoginDto;
 import Tproject.dto.UserDto;
 import Tproject.mapper.UserMapper;
 import Tproject.service.AuthService;
@@ -18,7 +19,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<JwtDto> login(@RequestBody AuthDto authDto){
+    public ResponseEntity<LoginDto> login(@RequestBody AuthDto authDto){
         return ResponseEntity.ok(authService.login(authDto));
 
     }

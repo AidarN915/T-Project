@@ -1,18 +1,23 @@
 package Tproject.service.Impl;
 
 import Tproject.dto.TaskCreateDto;
+import Tproject.enums.OperationType;
 import Tproject.model.Task;
 import Tproject.model.TaskList;
 import Tproject.model.User;
 import Tproject.repository.TaskListRepository;
 import Tproject.repository.TaskRepository;
 import Tproject.repository.UserRepository;
+import Tproject.security.CustomPermissionEvaluator;
+import Tproject.security.Target;
 import Tproject.service.TaskService;
 import Tproject.util.JwtUtil;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -26,19 +31,15 @@ public class TaskServiceImpl implements TaskService {
     private final TaskListRepository taskListRepository;
     private final JwtUtil jwtUtil;
     private final UserUtil userUtil;
+    private final CustomPermissionEvaluator permissionEvaluator;
     @Override
-    public Task create(Long taskListId,TaskCreateDto createDto,HttpServletRequest request) {
+    public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
-        User user = userUtil.getUserByRequest(request);
-        if(taskList.getBoard() != null) {
-            if (!taskList.getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(taskList.getOwner() != null){
-            if(taskList.getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        if(!permissionEvaluator.hasAccess(auth, Target.taskList(taskListId, OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         Task newTask = new Task();
@@ -57,27 +58,25 @@ public class TaskServiceImpl implements TaskService {
 
 
     @Override
-    public List<Task> getByTaskListId(Long taskListId) {
+    public List<Task> getByTaskListId(Long taskListId,Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
+        if (!permissionEvaluator.hasAccess(auth, Target.taskList(taskListId,OperationType.READ))) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return taskList.getTasks();
     }
 
     @Override
-    public Task update(Long id, TaskCreateDto createDto,HttpServletRequest request) {
+    public Task update(Long id, TaskCreateDto createDto,Authentication auth) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
-        User user = userUtil.getUserByRequest(request);
-        if(task.getTaskList().getBoard() != null) {
-            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(task.getTaskList().getOwner() != null){
-            if(task.getTaskList().getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
+
         if(createDto.getExecutor() != null) {
             User executor = userRepository.findByUsername(createDto.getExecutor().getUsername())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден"));
@@ -93,18 +92,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task changeStatus(Long id, boolean isDone,HttpServletRequest request) {
+    public Task changeStatus(Long id, boolean isDone,Authentication auth) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
-        User user = userUtil.getUserByRequest(request);
-        if(task.getTaskList().getBoard() != null) {
-            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(task.getTaskList().getOwner() != null){
-            if(task.getTaskList().getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.CHANGE_STATUS))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
         if(task.isDone() == isDone){
@@ -116,26 +110,23 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public String deleteTask(Long id,HttpServletRequest request) {
+    public String deleteTask(Long id,Authentication auth) {
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
-        User user = userUtil.getUserByRequest(request);
-        if(task.getTaskList().getBoard() != null) {
-            if (!task.getTaskList().getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(task.getTaskList().getOwner() != null){
-            if(task.getTaskList().getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }
-
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+       if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.MODIFY))){
+           throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+       }
         taskRepository.delete(task);
         return "Удалено";
     }
 
     @Override
-    public Task getById(Long id) {
+    public Task getById(Long id,Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.READ))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
     }

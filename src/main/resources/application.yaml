@@ -1,6 +1,6 @@
 jwt:
   secret: auhsdfuihpauisdfuhasiudhfuiasuiefjasndjgfbzkxclb/xm;dtjhyiodrtfhjknxdklfgjuiawergfuhasbfdfliughasyurgbhsjzrdgfhiuoshdufgisiarutghstyuerdghjksdfngjseruiygbsjdkfbgnjksdxbfjkgbserbghjdfj
-  rtExpirationDays: 14
+  rtExpiration: 12
   expiration: 3600000
 
 spring:

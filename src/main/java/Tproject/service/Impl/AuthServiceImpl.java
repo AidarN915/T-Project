@@ -2,6 +2,8 @@ package Tproject.service.Impl;
 
 import Tproject.dto.AuthDto;
 import Tproject.dto.JwtDto;
+import Tproject.dto.LoginDto;
+import Tproject.mapper.UserMapper;
 import Tproject.model.User;
 import Tproject.repository.UserRepository;
 import Tproject.service.AuthService;
@@ -31,7 +33,8 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final UserUtil userUtil;
-    @Value("${jwt.rtExpirationDays}")
+    private final UserMapper userMapper;
+    @Value("${jwt.rtExpiration}")
     private Integer refreshTokenExpiration;
 
 
@@ -52,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
         }
         String newRefreshToken = RefreshTokenUtil.generateRefreshToken();
         user.setRefreshToken(newRefreshToken);
-        user.setRefreshTokenExpires(LocalDateTime.now().plusDays(refreshTokenExpiration));
+        user.setRefreshTokenExpires(LocalDateTime.now().plusHours(refreshTokenExpiration));
         userRepository.save(user);
         String jwtToken = jwtUtil.generateToken(userDetailsService.loadUserByUsername(user.getUsername()));
         JwtDto dto = new JwtDto();
@@ -62,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtDto login(AuthDto authDto) {
+    public LoginDto login(AuthDto authDto) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
             authDto.getUsername(),
             authDto.getPassword()
@@ -74,13 +77,15 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(authDto.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
         user.setRefreshToken(refreshToken);
-        user.setRefreshTokenExpires(LocalDateTime.now().plusDays(refreshTokenExpiration));
+        user.setRefreshTokenExpires(LocalDateTime.now().plusHours(refreshTokenExpiration));
         userRepository.save(user);
 
+        LoginDto dto = new LoginDto();
         JwtDto jwt = new JwtDto();
-        jwt.setRefreshToken(refreshToken);
         jwt.setToken(token);
-        return jwt;
+        jwt.setRefreshToken(refreshToken);
+        dto = userMapper.toLoginDto(user,jwt);
+        return dto;
     }
 
     @Override

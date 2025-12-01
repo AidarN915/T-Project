@@ -1,5 +1,6 @@
 package Tproject.service.Impl;
 
+import Tproject.enums.OperationType;
 import Tproject.model.Board;
 import Tproject.model.Project;
 import Tproject.model.TaskList;
@@ -7,11 +8,14 @@ import Tproject.model.User;
 import Tproject.repository.BoardRepository;
 import Tproject.repository.ProjectRepository;
 import Tproject.repository.TaskListRepository;
+import Tproject.repository.UserRepository;
+import Tproject.security.CustomPermissionEvaluator;
+import Tproject.security.Target;
 import Tproject.service.TaskListService;
 import Tproject.util.UserUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -25,22 +29,31 @@ public class TaskListServiceImpl implements TaskListService {
     private final UserUtil userUtil;
     private final BoardRepository boardRepository;
     private final ProjectRepository projectRepository;
+    private final UserRepository userRepository;
+    private final CustomPermissionEvaluator permissionEvaluator;
     @Override
-    public TaskList create(Long boardId,String title, HttpServletRequest request) {
+    public TaskList create(Long boardId,String title,  Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth, Target.board(boardId, OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         TaskList newList = new TaskList();
         newList.setTitle(title);
         if(boardId != 0) {
             newList.setBoard(boardRepository.findById(boardId)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Доска не найдена")));
         }else{
-            newList.setOwner(userUtil.getUserByRequest(request));
+            newList.setOwner(userRepository.findByUsername(auth.getName())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
         }
         taskListRepository.save(newList);
         return newList;
     }
 
     @Override
-    public List<TaskList> getByBoardId(Long boardId,HttpServletRequest request) {
+    public List<TaskList> getByBoardId(Long boardId, Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth,Target.board(boardId,OperationType.READ))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
         return boardRepository.findById(boardId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена"))
                 .getTaskLists();
@@ -48,42 +61,33 @@ public class TaskListServiceImpl implements TaskListService {
     }
 
     @Override
-    public List<TaskList> all(HttpServletRequest request) {
-        User user = userUtil.getUserByRequest(request);
-        /*List<TaskList> listsFromProjects = user.getProjects().stream()
-                .flatMap(project -> project.getBoards().stream())
-                .flatMap(board -> board.getTaskLists().stream())
-                .toList();*/
-        List<TaskList> listsFromProjects = new ArrayList<TaskList>();
-        for(Project project:projectRepository.getByUsers(user)){
-            for(Board board:project.getBoards()){
-                listsFromProjects.addAll(board.getTaskLists());
+    public List<TaskList> all( Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+        if (user.getRole().equals("SUPERADMIN") || user.getRole().equals("ADMIN")) {
+            return taskListRepository.findAll();
+        } else {
+            List<TaskList> listsFromProjects = new ArrayList<TaskList>();
+            for (Project project : projectRepository.getByViewers(user)) {
+                for (Board board : project.getBoards()) {
+                    listsFromProjects.addAll(board.getTaskLists());
+                }
             }
-        }
-        List<TaskList> orphanLists = taskListRepository.findByOwner(user);
+            List<TaskList> orphanLists = taskListRepository.findByOwner(user);
 
-        List<TaskList> allLists = new ArrayList<>(listsFromProjects);
-        allLists.addAll(orphanLists);
-        return allLists;
+            List<TaskList> allLists = new ArrayList<>(listsFromProjects);
+            allLists.addAll(orphanLists);
+            return allLists;
+        }
     }
 
     @Override
-    public TaskList update(String title, Long taskListId, HttpServletRequest request) {
+    public TaskList update(String title, Long taskListId,  Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
-        User user = userUtil.getUserByRequest(request);
-        if(taskList.getBoard() != null) {
-            if (!taskList.getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(taskList.getOwner() != null){
-            if(taskList.getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }
-        /*if((taskList.getOwner() != null && taskList.getOwner() != user) || (taskList.getBoard() != null && !taskList.getBoard().getProject().getUsers().contains(user))){
+        if(!permissionEvaluator.hasAccess(auth,Target.taskList(taskListId,OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }*/
+        }
         if(taskList.getTitle() == title){
             return taskList;
         }
@@ -93,18 +97,11 @@ public class TaskListServiceImpl implements TaskListService {
     }
 
     @Override
-    public String delete(Long taskListId, HttpServletRequest request) {
+    public String delete(Long taskListId,  Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        User user = userUtil.getUserByRequest(request);
-        if(taskList.getBoard() != null) {
-            if (!taskList.getBoard().getProject().getUsers().contains(user)) {
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
-        }else if(taskList.getOwner() != null){
-            if(taskList.getOwner() != user){
-                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-            }
+        if(!permissionEvaluator.hasAccess(auth,Target.taskList(taskListId,OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         taskListRepository.delete(taskList);
         return "Удалено";

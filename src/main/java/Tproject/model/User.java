@@ -32,8 +32,14 @@ public class User {
     private String refreshToken;
     private LocalDateTime refreshTokenExpires;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<Project> projects = new HashSet<>();
+    @ManyToMany(mappedBy = "viewers")
+    private Set<Project> viewProjects = new HashSet<>();
+
+    @ManyToMany(mappedBy = "executors")
+    private Set<Project> executeProjects = new HashSet<>();
+
+    @ManyToMany(mappedBy = "moderators")
+    private Set<Project> moderateProjects = new HashSet<>();
 
     @OneToMany(mappedBy = "owner")
     private List<TaskList> taskLists;
