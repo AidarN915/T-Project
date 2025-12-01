@@ -27,9 +27,10 @@ public class UserServiceImpl implements UserService {
         if(!user.getRole().equals("SUPERADMIN") || username.equals(user.getUsername())){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        user.setRole(newRole);
-        userRepository.save(user);
+        User newUser = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        newUser.setRole(newRole);
+        userRepository.save(newUser);
         return user;
-
     }
 }
