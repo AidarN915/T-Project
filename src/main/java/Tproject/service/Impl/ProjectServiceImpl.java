@@ -80,25 +80,30 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
         project.setTitle(updateDto.getTitle());
-
-        Set<User> viewers = updateDto.getViewers().stream()
-                .map(dto -> userRepository.findByUsername(dto.getUsername())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")))
-                .collect(Collectors.toSet());
-        Set<User> executors = updateDto.getExecutors().stream()
-                .map(dto -> userRepository.findByUsername(dto.getUsername())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")))
-                .collect(Collectors.toSet());
-        Set<User> moderators = updateDto.getModerators().stream()
-                .map(dto -> userRepository.findByUsername(dto.getUsername())
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")))
-                .collect(Collectors.toSet());
-        project.getViewers().clear();
-        project.getViewers().addAll(viewers);
-        project.getExecutors().clear();
-        project.getExecutors().addAll(executors);
-        project.getModerators().clear();
-        project.getModerators().addAll(moderators);
+        if(updateDto.getViewers() != null) {
+            Set<User> viewers = updateDto.getViewers().stream()
+                    .map(dto -> userRepository.findByUsername(dto.getUsername())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
+                    .collect(Collectors.toSet());
+            project.getViewers().clear();
+            project.getViewers().addAll(viewers);
+        }
+        if(updateDto.getExecutors() != null) {
+            Set<User> executors = updateDto.getExecutors().stream()
+                    .map(dto -> userRepository.findByUsername(dto.getUsername())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
+                    .collect(Collectors.toSet());
+            project.getExecutors().clear();
+            project.getExecutors().addAll(executors);
+        }
+        if(updateDto.getModerators() != null) {
+            Set<User> moderators = updateDto.getModerators().stream()
+                    .map(dto -> userRepository.findByUsername(dto.getUsername())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
+                    .collect(Collectors.toSet());
+            project.getModerators().clear();
+            project.getModerators().addAll(moderators);
+        }
         projectRepository.save(project);
         return project;
     }
