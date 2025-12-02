@@ -26,10 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TaskListServiceImpl implements TaskListService {
     private final TaskListRepository taskListRepository;
-    private final UserUtil userUtil;
     private final BoardRepository boardRepository;
-    private final ProjectRepository projectRepository;
-    private final UserRepository userRepository;
     private final CustomPermissionEvaluator permissionEvaluator;
     @Override
     public TaskList create(Long boardId,String title,  Authentication auth) {

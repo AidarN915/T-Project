@@ -16,5 +16,6 @@ public interface ProjectsUsersRepository extends JpaRepository<ProjectsUsers, Lo
     public List<ProjectsUsers> findByRole(Role role);
     public List<ProjectsUsers> findByRoleAndUser(UserProjectRoles role,User user);
 
+    boolean existsByUserAndProject(User user,Project project);
     boolean existsByUserAndProjectAndRole(User user, Project project, UserProjectRoles role);
 }
