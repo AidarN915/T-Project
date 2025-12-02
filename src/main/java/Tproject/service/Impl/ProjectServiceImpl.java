@@ -53,7 +53,7 @@ public class ProjectServiceImpl implements ProjectService {
             return projectRepository.findAll();
         }else {
             return projectsUsersRepository
-                    .findByRoleAndUser(UserProjectRoles.VIEWER, user)
+                    .findByUser(user)
                     .stream()
                     .map(ProjectsUsers::getProject).distinct().collect(Collectors.toList());
         }
