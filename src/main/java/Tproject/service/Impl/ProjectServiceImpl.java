@@ -1,10 +1,14 @@
 package Tproject.service.Impl;
 
 import Tproject.dto.ProjectUpdateDto;
+import Tproject.dto.UserDto;
 import Tproject.enums.OperationType;
+import Tproject.enums.UserProjectRoles;
 import Tproject.model.Project;
+import Tproject.model.ProjectsUsers;
 import Tproject.model.User;
 import Tproject.repository.ProjectRepository;
+import Tproject.repository.ProjectsUsersRepository;
 import Tproject.repository.UserRepository;
 import Tproject.security.CustomPermissionEvaluator;
 import Tproject.security.Target;
@@ -27,9 +31,9 @@ import java.util.stream.Collectors;
 @Service
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
-    private final UserUtil userUtil;
     private final UserRepository userRepository;
     private final CustomPermissionEvaluator permissionEvaluator;
+    private final ProjectsUsersRepository projectsUsersRepository;
 
     @Override
     public Project getById(Long id, Authentication auth) {
@@ -48,11 +52,10 @@ public class ProjectServiceImpl implements ProjectService {
         if(user.getRole().equals("SUPERADMIN") || user.getRole().equals("ADMIN")) {
             return projectRepository.findAll();
         }else {
-            Set<Project> projects = new HashSet<>();
-            if(user.getViewProjects() != null) projects.addAll(user.getViewProjects());
-            if(user.getExecuteProjects() != null) projects.addAll(user.getExecuteProjects());
-            if(user.getModerateProjects() != null) projects.addAll(user.getModerateProjects());
-            return new ArrayList<>(projects);
+            return projectsUsersRepository
+                    .findByRoleAndUser(UserProjectRoles.VIEWER, user)
+                    .stream()
+                    .map(ProjectsUsers::getProject).distinct().collect(Collectors.toList());
         }
     }
 
@@ -62,10 +65,12 @@ public class ProjectServiceImpl implements ProjectService {
         project.setTitle(title);
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        if(!project.getViewers().add(user)
-                || !project.getExecutors().add(user)
-                || !project.getModerators().add(user)){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Не удалось добавить пользователя");
+        for (UserProjectRoles role : List.of(UserProjectRoles.VIEWER, UserProjectRoles.MODERATOR, UserProjectRoles.EXECUTOR)) {
+            ProjectsUsers pu = new ProjectsUsers();
+            pu.setUser(user);
+            pu.setProject(project);
+            pu.setRole(role);
+            project.getProjectsUsers().add(pu);
         }
         projectRepository.save(project);
         return project;
@@ -80,29 +85,17 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
         project.setTitle(updateDto.getTitle());
+        if(updateDto.getViewers() != null || updateDto.getExecutors() != null || updateDto.getModerators() != null) {
+            project.getProjectsUsers().clear();
+        }
         if(updateDto.getViewers() != null) {
-            Set<User> viewers = updateDto.getViewers().stream()
-                    .map(dto -> userRepository.findByUsername(dto.getUsername())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
-                    .collect(Collectors.toSet());
-            project.getViewers().clear();
-            project.getViewers().addAll(viewers);
+            addUsersToProject(project, updateDto.getViewers(), UserProjectRoles.VIEWER);
         }
         if(updateDto.getExecutors() != null) {
-            Set<User> executors = updateDto.getExecutors().stream()
-                    .map(dto -> userRepository.findByUsername(dto.getUsername())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
-                    .collect(Collectors.toSet());
-            project.getExecutors().clear();
-            project.getExecutors().addAll(executors);
+            addUsersToProject(project, updateDto.getExecutors(), UserProjectRoles.EXECUTOR);
         }
         if(updateDto.getModerators() != null) {
-            Set<User> moderators = updateDto.getModerators().stream()
-                    .map(dto -> userRepository.findByUsername(dto.getUsername())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
-                    .collect(Collectors.toSet());
-            project.getModerators().clear();
-            project.getModerators().addAll(moderators);
+            addUsersToProject(project, updateDto.getModerators(), UserProjectRoles.MODERATOR);
         }
         projectRepository.save(project);
         return project;
@@ -118,4 +111,23 @@ public class ProjectServiceImpl implements ProjectService {
         projectRepository.delete(project);
         return "Удалено";
     }
+
+    private void addUsersToProject(Project project, List<UserDto> dtos, UserProjectRoles role) {
+        if (dtos == null) return;
+
+        List<ProjectsUsers> pus = dtos.stream()
+                .map(dto -> {
+                    User user = userRepository.findByUsername(dto.getUsername())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
+                    ProjectsUsers pu = new ProjectsUsers();
+                    pu.setProject(project);
+                    pu.setUser(user);
+                    pu.setRole(role);
+                    return pu;
+                })
+                .toList();
+
+        project.getProjectsUsers().addAll(pus);
+    }
+
 }

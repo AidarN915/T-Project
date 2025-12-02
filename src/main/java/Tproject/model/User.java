@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,15 +33,7 @@ public class User {
     private String refreshToken;
     private LocalDateTime refreshTokenExpires;
 
-    @ManyToMany(mappedBy = "viewers")
-    private Set<Project> viewProjects = new HashSet<>();
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ProjectsUsers> projectsUsers = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "executors")
-    private Set<Project> executeProjects = new HashSet<>();
-
-    @ManyToMany(mappedBy = "moderators")
-    private Set<Project> moderateProjects = new HashSet<>();
-
-    @OneToMany(mappedBy = "owner")
-    private List<TaskList> taskLists;
 }

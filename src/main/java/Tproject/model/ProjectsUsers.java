@@ -1,30 +1,27 @@
 package Tproject.model;
 
+import Tproject.enums.UserProjectRoles;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
-
-@Getter
-@Setter
+@Data
 @Entity
-@Table(name = "boards")
+@Table(name = "projects_users")
 @ToString(onlyExplicitlyIncluded = true)
-public class Board {
+public class ProjectsUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(nullable = false)
-    private String title;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "board",cascade = CascadeType.REMOVE,orphanRemoval = true)
-    private List<TaskList> taskLists;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @Enumerated(EnumType.STRING)
+    private UserProjectRoles role;
 }

@@ -22,9 +22,6 @@ public class TaskList {
     private List<Task> tasks;
 
     @ManyToOne
-    @JoinColumn(name = "board_id",nullable = true)
+    @JoinColumn(name = "board_id")
     private Board board;
-    @ManyToOne
-    @JoinColumn(name = "owner_id",nullable = true)
-    private User owner;
 }

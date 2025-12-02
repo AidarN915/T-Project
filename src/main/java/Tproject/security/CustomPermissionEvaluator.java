@@ -2,6 +2,7 @@ package Tproject.security;
 
 import Tproject.enums.ObjectType;
 import Tproject.enums.OperationType;
+import Tproject.enums.UserProjectRoles;
 import Tproject.model.*;
 import Tproject.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class CustomPermissionEvaluator{
     private final TaskListRepository taskListRepository;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final ProjectsUsersRepository projectsUsersRepository;
 
     public boolean hasAccess(Authentication auth, TargetIdentifier target) {
         if (auth == null || !auth.isAuthenticated() || target == null) {
@@ -37,78 +39,41 @@ public class CustomPermissionEvaluator{
             return true;
         }
 
-        return switch (target.type()) {
-            case PROJECT -> hasProjectAccess(user, target.id(),target.opType());
-            case BOARD -> hasBoardAccess(user, target.id(),target.opType());
-            case TASK_LIST -> hasTaskListAccess(user, target.id(),target.opType());
-            case TASK -> hasTaskAccess(user, target.id(),target.opType());
+        Project project;
+        switch (target.type()){
+            case PROJECT:
+                project = projectRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
+                break;
+            case BOARD:
+                project = boardRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена"))
+                        .getProject();
+                break;
+            case TASK_LIST:
+                project = taskListRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
+                        .getBoard()
+                        .getProject();
+                break;
+            case TASK:
+                project = taskRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
+                        .getTaskList()
+                        .getBoard()
+                        .getProject();
+                break;
+            default:
+                return false;
+        }
+
+        return switch (target.opType()) {
+            case OperationType.READ -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.VIEWER);
+            case OperationType.CHANGE_STATUS -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.EXECUTOR);
+            case OperationType.MODIFY -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR);
             default -> false;
         };
     }
 
-    private boolean hasProjectAccess(User user, Long projectId, OperationType op) {
-        Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found"));
-        return switch (op) {
-            case OperationType.READ -> project.getViewers().contains(user);
-            case OperationType.CHANGE_STATUS -> project.getExecutors().contains(user);
-            case OperationType.MODIFY -> project.getModerators().contains(user);
-            default -> false;
-        };
-    }
-
-    private boolean hasBoardAccess(User user, Long boardId, OperationType op) {
-        Board board;
-        if(boardId != 0) {
-            board = boardRepository.findById(boardId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Board not found"));
-        }else {
-            return true;
-        }
-        return switch (op) {
-            case OperationType.READ -> board.getProject().getViewers().contains(user);
-            case OperationType.CHANGE_STATUS -> board.getProject().getExecutors().contains(user);
-            case OperationType.MODIFY -> board.getProject().getModerators().contains(user);
-            default -> false;
-        };
-    }
-
-    private boolean hasTaskListAccess(User user, Long taskListId, OperationType op) {
-        TaskList taskList = taskListRepository.findById(taskListId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TaskList not found"));
-
-        if (taskList.getBoard() != null) {
-            return switch (op) {
-                case OperationType.READ -> taskList.getBoard().getProject().getViewers().contains(user);
-                case OperationType.CHANGE_STATUS ->  taskList.getBoard().getProject().getExecutors().contains(user);
-                case OperationType.MODIFY ->  taskList.getBoard().getProject().getModerators().contains(user);
-                default -> false;
-            };
-        } else {
-            return user.equals(taskList.getOwner());
-        }
-    }
-
-    private boolean hasTaskAccess(User user, Long taskId, OperationType op) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Task not found"));
-
-        if (task.getTaskList().getBoard() != null) {
-            return switch (op) {
-                case OperationType.READ -> task.getTaskList().getBoard().getProject().getViewers().contains(user);
-                case OperationType.CHANGE_STATUS -> task.getTaskList().getBoard().getProject().getExecutors().contains(user);
-                case OperationType.MODIFY -> task.getTaskList().getBoard().getProject().getModerators().contains(user);
-                default -> false;
-            };
-        } else {
-            Set<User> authorizedUsers = new HashSet<>();
-            authorizedUsers.add(task.getCreator());
-            if (task.getExecutor() != null) {
-                authorizedUsers.add(task.getExecutor());
-            }
-            authorizedUsers.add(task.getTaskList().getOwner());
-            return authorizedUsers.contains(user);
-        }
-    }
 
 }

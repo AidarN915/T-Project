@@ -38,13 +38,8 @@ public class TaskListServiceImpl implements TaskListService {
         }
         TaskList newList = new TaskList();
         newList.setTitle(title);
-        if(boardId != 0) {
-            newList.setBoard(boardRepository.findById(boardId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Доска не найдена")));
-        }else{
-            newList.setOwner(userRepository.findByUsername(auth.getName())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
-        }
+        newList.setBoard(boardRepository.findById(boardId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Доска не найдена")));
         taskListRepository.save(newList);
         return newList;
     }
@@ -58,27 +53,6 @@ public class TaskListServiceImpl implements TaskListService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена"))
                 .getTaskLists();
 
-    }
-
-    @Override
-    public List<TaskList> all( Authentication auth) {
-        User user = userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден"));
-        if (user.getRole().equals("SUPERADMIN") || user.getRole().equals("ADMIN")) {
-            return taskListRepository.findAll();
-        } else {
-            List<TaskList> listsFromProjects = new ArrayList<TaskList>();
-            for (Project project : projectRepository.getByViewers(user)) {
-                for (Board board : project.getBoards()) {
-                    listsFromProjects.addAll(board.getTaskLists());
-                }
-            }
-            List<TaskList> orphanLists = taskListRepository.findByOwner(user);
-
-            List<TaskList> allLists = new ArrayList<>(listsFromProjects);
-            allLists.addAll(orphanLists);
-            return allLists;
-        }
     }
 
     @Override

@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,23 +25,8 @@ public class Project {
     private String title;
 
     @OneToMany(mappedBy = "project",cascade = CascadeType.REMOVE,orphanRemoval = true)
-    private List<Board> boards;
+    private List<Board> boards = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(name = "viewers_projects",
-    joinColumns = @JoinColumn(name = "project_id"),
-    inverseJoinColumns = @JoinColumn(name = "viewer_id"))
-    private Set<User> viewers = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "executors_projects",
-    joinColumns = @JoinColumn(name = "project_id"),
-    inverseJoinColumns = @JoinColumn(name = "executor_id"))
-    private Set<User> executors = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "moderators_projects",
-    joinColumns = @JoinColumn(name = "project_id"),
-    inverseJoinColumns = @JoinColumn(name = "moderator_id"))
-    private Set<User> moderators = new HashSet<>();
+    @OneToMany(mappedBy = "project",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<ProjectsUsers> projectsUsers = new ArrayList<>();
 }

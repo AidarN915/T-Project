@@ -24,11 +24,6 @@ public class TaskListController {
         return ResponseEntity.ok(taskListMapper.toListDto(taskListService.getByBoardId(boardId,auth)));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<TaskListDto>> getAll(Authentication auth){
-        return ResponseEntity.ok(taskListMapper.toListDto(taskListService.all(auth)));
-    }
-
     @PostMapping("/create/{boardId}")
     public ResponseEntity<TaskListDto> create(@PathVariable Long boardId,
                                               Authentication auth,
