@@ -26,6 +26,7 @@ public class CustomPermissionEvaluator{
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final ProjectsUsersRepository projectsUsersRepository;
+    private final CommentRepository commentRepository;
 
     public boolean hasAccess(Authentication auth, TargetIdentifier target) {
         if (auth == null || !auth.isAuthenticated() || target == null) {
@@ -63,6 +64,13 @@ public class CustomPermissionEvaluator{
                         .getBoard()
                         .getProject();
                 break;
+            case COMMENT:
+                project = commentRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
+                        .getTask()
+                        .getTaskList()
+                        .getBoard()
+                        .getProject();
             default:
                 return false;
         }

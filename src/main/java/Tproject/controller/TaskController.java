@@ -25,6 +25,10 @@ public class TaskController {
     public ResponseEntity<TaskDto> getById(@PathVariable Long id, Authentication auth){
         return ResponseEntity.ok(taskMapper.toDto(taskService.getById(id,auth)));
     }
+    @GetMapping("/my")
+    public ResponseEntity<List<TaskDto>> getMyTasks(Authentication auth){
+        return ResponseEntity.ok(taskMapper.toListDto(taskService.getMyTasks(auth)));
+    }
     @GetMapping("/{taskListId}/all")
     public ResponseEntity<List<TaskDto>> getMy(@PathVariable Long taskListId,Authentication auth){
         return ResponseEntity.ok(taskMapper.toListDto(taskService.getByTaskListId(taskListId,auth)));

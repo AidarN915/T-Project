@@ -130,4 +130,10 @@ public class TaskServiceImpl implements TaskService {
         return taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
     }
+    @Override
+    public List<Task> getMyTasks(Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        return taskRepository.findByExecutor(user);
+    }
 }

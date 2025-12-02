@@ -4,5 +4,6 @@ public enum ObjectType {
     PROJECT,
     BOARD,
     TASK_LIST,
-    TASK
+    TASK,
+    COMMENT
 }

@@ -16,5 +16,8 @@ public class Target {
     public static TargetIdentifier task(Long id, OperationType type) {
         return new TargetIdentifier(ObjectType.TASK, id,type);
     }
+    public static TargetIdentifier comment(Long id, OperationType type) {
+        return new TargetIdentifier(ObjectType.COMMENT, id,type);
+    }
 
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -29,4 +30,6 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "list_id")
     private TaskList taskList;
+    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Comment> comments;
 }
