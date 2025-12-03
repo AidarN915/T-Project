@@ -4,8 +4,7 @@ import Tproject.model.ChatMessage;
 import Tproject.model.ChatRoom;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
-
-import java.awt.print.Pageable;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ChatService {
