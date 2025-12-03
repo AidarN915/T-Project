@@ -5,5 +5,6 @@ public enum ObjectType {
     BOARD,
     TASK_LIST,
     TASK,
-    COMMENT
+    COMMENT,
+    CHAT
 }

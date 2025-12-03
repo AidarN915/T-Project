@@ -1,10 +1,13 @@
 package Tproject.service.Impl;
 
+import Tproject.dto.ChatMessageDto;
 import Tproject.dto.TaskCreateDto;
 import Tproject.enums.OperationType;
+import Tproject.model.ChatMessage;
 import Tproject.model.Task;
 import Tproject.model.TaskList;
 import Tproject.model.User;
+import Tproject.repository.ChatRoomRepository;
 import Tproject.repository.TaskListRepository;
 import Tproject.repository.TaskRepository;
 import Tproject.repository.UserRepository;
@@ -16,6 +19,7 @@ import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,8 @@ public class TaskServiceImpl implements TaskService {
     private final JwtUtil jwtUtil;
     private final UserUtil userUtil;
     private final CustomPermissionEvaluator permissionEvaluator;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ChatRoomRepository chatRoomRepository;
     @Override
     public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
@@ -93,6 +99,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task changeStatus(Long id, boolean isDone,Authentication auth) {
+
         Task task = taskRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
         User user = userRepository.findByUsername(auth.getName())
@@ -106,6 +113,11 @@ public class TaskServiceImpl implements TaskService {
         }
         task.setDone(isDone);
         taskRepository.save(task);
+
+        messagingTemplate.convertAndSend(
+                "/topic/room."+chatRoomRepository.findByTask(task),
+                "task status changed to " + isDone
+        );
         return task;
     }
 

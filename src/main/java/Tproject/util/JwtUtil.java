@@ -74,6 +74,9 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+    public Boolean validateTokenExpire(String token) {
+        return (!isTokenExpired(token));
+    }
 
     private Key getSignKey() {
         byte[] keyBytes = secret.getBytes();

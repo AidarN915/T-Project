@@ -19,5 +19,8 @@ public class Target {
     public static TargetIdentifier comment(Long id, OperationType type) {
         return new TargetIdentifier(ObjectType.COMMENT, id,type);
     }
+    public static TargetIdentifier chat(Long id, OperationType type) {
+        return new TargetIdentifier(ObjectType.CHAT, id,type);
+    }
 
 }
