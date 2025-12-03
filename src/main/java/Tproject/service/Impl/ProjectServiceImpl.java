@@ -65,13 +65,11 @@ public class ProjectServiceImpl implements ProjectService {
         project.setTitle(title);
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        for (UserProjectRoles role : List.of(UserProjectRoles.VIEWER, UserProjectRoles.MODERATOR, UserProjectRoles.EXECUTOR)) {
-            ProjectsUsers pu = new ProjectsUsers();
-            pu.setUser(user);
-            pu.setProject(project);
-            pu.setRole(role);
-            project.getProjectsUsers().add(pu);
-        }
+        ProjectsUsers pu = new ProjectsUsers();
+        pu.setUser(user);
+        pu.setProject(project);
+        pu.setRole(UserProjectRoles.MODERATOR);
+        project.getProjectsUsers().add(pu);
         projectRepository.save(project);
         return project;
 
