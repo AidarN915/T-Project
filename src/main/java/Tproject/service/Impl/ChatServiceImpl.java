@@ -2,6 +2,7 @@ package Tproject.service.Impl;
 
 import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
+import Tproject.mapper.ChatMessageMapper;
 import Tproject.model.*;
 import Tproject.repository.ChatMessageRepository;
 import Tproject.repository.ChatRoomRepository;
@@ -13,6 +14,7 @@ import Tproject.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,6 +32,8 @@ public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
     private final TaskRepository taskRepository;
     private final CustomPermissionEvaluator permissionEvaluator;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final ChatMessageMapper chatMessageMapper;
     @Override
     public ChatRoom getTaskChatRoom(Long taskId, Authentication auth) {
         if(!permissionEvaluator.hasAccess(auth, Target.task(taskId, OperationType.READ))){
@@ -75,6 +79,9 @@ public class ChatServiceImpl implements ChatService {
                                     chatRoomRepository.save(newChat);
                                     return newChat;
                                 }));
+        sendEventMessage(chatRoom.getId(),
+                "Пользователь " + auth.getName() + " создал чат",
+                auth);
         return chatRoom;
     }
 
@@ -92,6 +99,28 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
         message.setChatRoom(chatRoom);
         chatMessageRepository.save(message);
+        messagingTemplate.convertAndSend(
+                "/topic/room."+chatRoom.getId(),
+                chatMessageMapper.toDto(message));
+        return message;
+    }
+    @Override
+    public ChatMessage sendEventMessage(Long chatRoomId, String text,Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Чат не найден"));
+        ChatMessage message = new ChatMessage();
+        message.setMessageType(MessageType.EVENT);
+        message.setText(text);
+        message.setSender(userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
+        message.setChatRoom(chatRoom);
+        chatMessageRepository.save(message);
+        messagingTemplate.convertAndSend(
+                "/topic/room."+chatRoom.getId(),
+                chatMessageMapper.toDto(message));
         return message;
     }
 

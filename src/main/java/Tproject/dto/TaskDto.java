@@ -15,4 +15,5 @@ public class TaskDto {
     private boolean isDone;
     private UserDto executor;
     private UserDto creator;
+    private Long chatRoomId;
 }

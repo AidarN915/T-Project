@@ -11,6 +11,7 @@ public interface ChatService {
     public ChatRoom getTaskChatRoom(Long taskId, Authentication auth);
     public ChatRoom getChatWithUser(String username,Authentication auth);
     public ChatMessage sendMessage(Long chatRoomId,String text,Authentication auth);
+    public ChatMessage sendEventMessage(Long chatRoomId,String text,Authentication auth);
     public Page<ChatMessage> getChatMessages(Long chatRoomId, Pageable pageable,Authentication auth);
     public List<ChatRoom> getAllMyChats(Authentication auth);
 }

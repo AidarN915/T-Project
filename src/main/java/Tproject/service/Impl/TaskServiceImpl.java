@@ -3,16 +3,14 @@ package Tproject.service.Impl;
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.TaskCreateDto;
 import Tproject.enums.OperationType;
-import Tproject.model.ChatMessage;
-import Tproject.model.Task;
-import Tproject.model.TaskList;
-import Tproject.model.User;
+import Tproject.model.*;
 import Tproject.repository.ChatRoomRepository;
 import Tproject.repository.TaskListRepository;
 import Tproject.repository.TaskRepository;
 import Tproject.repository.UserRepository;
 import Tproject.security.CustomPermissionEvaluator;
 import Tproject.security.Target;
+import Tproject.service.ChatService;
 import Tproject.service.TaskService;
 import Tproject.util.JwtUtil;
 import Tproject.util.UserUtil;
@@ -26,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,6 +37,7 @@ public class TaskServiceImpl implements TaskService {
     private final CustomPermissionEvaluator permissionEvaluator;
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatService chatService;
     @Override
     public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
@@ -59,6 +59,18 @@ public class TaskServiceImpl implements TaskService {
         newTask.setDescription(createDto.getDescription());
         newTask.setTitle(createDto.getTitle());
         taskRepository.save(newTask);
+
+        ChatRoom chatRoom = new ChatRoom();
+        chatRoom.setTask(newTask);
+        chatRoom.setType("TASK");
+        chatRoom.setUsers(newTask.getTaskList().getBoard().
+                getProject().getProjectsUsers()
+                .stream().map(ProjectsUsers::getUser)
+                .collect(Collectors.toSet()));
+        chatRoomRepository.save(chatRoom);
+        chatService.sendEventMessage(chatRoom.getId(),
+                "Пользователь " + auth.getName() + " создал задачу",
+                auth);
         return newTask;
     }
 

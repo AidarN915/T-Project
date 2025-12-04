@@ -20,7 +20,7 @@ public class ChatRoom {
 
     private String type;//"TASK" or "USER"
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "task_id")
     private Task task;
 

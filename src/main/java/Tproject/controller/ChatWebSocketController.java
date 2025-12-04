@@ -1,11 +1,16 @@
 package Tproject.controller;
 
+import Tproject.dto.ChatHistoryRequest;
+import Tproject.dto.ChatMessageDto;
 import Tproject.dto.SendMessageRequest;
 import Tproject.mapper.ChatMessageMapper;
 import Tproject.mapper.ChatRoomMapper;
 import Tproject.model.ChatMessage;
 import Tproject.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -24,10 +29,19 @@ public class ChatWebSocketController {
     public void sendMessage(
             @Payload SendMessageRequest request,
             Authentication auth){
-        ChatMessage message = chatService.sendMessage(request.getChatRoomId(),request.getText(),auth);
+        chatService.sendMessage(request.getChatRoomId(),request.getText(),auth);
+    }
+
+    @MessageMapping("/chat.history")
+    public void getChatHistory(
+            @Payload ChatHistoryRequest request,
+            Authentication auth){
+        Pageable pageable = PageRequest.of(request.getPage(),request.getSize());
+        Page<ChatMessage> messages = chatService.getChatMessages(request.getChatRoomId(),pageable,auth);
+        Page<ChatMessageDto> messageDto = messages.map(chatMessageMapper::toDto);
         messagingTemplate.convertAndSend(
-                "/topic/room." + message.getChatRoom().getId(),
-                chatMessageMapper.toDto(message)
+                "/topic/room." + request.getChatRoomId() + ".history",
+                messageDto
         );
     }
 }
