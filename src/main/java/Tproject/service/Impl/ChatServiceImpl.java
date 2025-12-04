@@ -77,6 +77,8 @@ public class ChatServiceImpl implements ChatService {
                                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
                                     newChat.setUsers(new HashSet<>(set));
                                     chatRoomRepository.save(newChat);
+                                    messagingTemplate.convertAndSend("/topic/user." + user.getId(),
+                                            newChat.getId());
                                     return newChat;
                                 }));
         sendEventMessage(chatRoom.getId(),

@@ -71,6 +71,11 @@ public class TaskServiceImpl implements TaskService {
         chatService.sendEventMessage(chatRoom.getId(),
                 "Пользователь " + auth.getName() + " создал задачу",
                 auth);
+        for(User userForNotify:chatRoom.getUsers()){
+            messagingTemplate.convertAndSend("/topic/user." + userForNotify.getId(),
+                    chatRoom.getId());
+        }
+        newTask.setChatRoom(chatRoom);
         return newTask;
     }
 
