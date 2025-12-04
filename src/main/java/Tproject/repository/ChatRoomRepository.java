@@ -12,5 +12,5 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom,Long> {
     public List<ChatRoom> findByUsers(User user);
     public Optional<ChatRoom> findByTask(Task task);
     public Optional<ChatRoom> findByChatRoomKey(String chatRoomKey);
-    public boolean existsByUserAndId(User user,Long id);
+    public boolean existsByUsersAndId(User user,Long id);
 }

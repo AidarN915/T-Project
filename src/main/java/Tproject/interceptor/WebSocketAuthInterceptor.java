@@ -70,7 +70,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                     Long chatRoomId = Long.parseLong(temp[1]);
                     User user = userRepository.findByUsername(username)
                             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-                    if(!chatRoomRepository.existsByUserAndId(user,chatRoomId)){
+                    if(!chatRoomRepository.existsByUsersAndId(user,chatRoomId)){
                         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
                     }
                 }
