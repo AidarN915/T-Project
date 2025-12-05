@@ -42,4 +42,6 @@ public class User {
     @ManyToMany(mappedBy = "users")
     private Set<ChatRoom> chatRooms = new HashSet<>();
 
+    private String avatarUrl;
+
 }

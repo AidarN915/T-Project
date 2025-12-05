@@ -6,22 +6,35 @@ import Tproject.repository.UserRepository;
 import Tproject.service.UserService;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserUtil userUtil;
+    @Value("${uploads.avatars}")
+    private String avatarsPath;
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
+    @Override
     public User setRole(String username, String newRole, HttpServletRequest request){
         User user = userUtil.getUserByRequest(request);
         if(!user.getRole().equals("SUPERADMIN") || username.equals(user.getUsername())){
@@ -35,6 +48,51 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
         newUser.setRole(newRole);
         userRepository.save(newUser);
+        return user;
+    }
+    @Override
+    @Transactional
+    public User updateName(String username, Authentication auth){
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        if(user.getUsername().equals(username)){
+            return user;
+        }
+        if(userRepository.existsByUsername(username)){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Данное имя пользователя занято");
+        }
+        user.setUsername(username);
+        userRepository.save(user);
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(
+                        user.getUsername(),
+                        auth.getCredentials(),
+                        auth.getAuthorities()
+                )
+        );
+
+        return user;
+    }
+
+    @Override
+    public User uploadAvatar(MultipartFile file, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+
+        String ext = Objects.requireNonNull(file.getOriginalFilename())
+                .substring(file.getOriginalFilename().lastIndexOf("."));
+        String fileName = user.getId() + "_" + UUID.randomUUID() + ext;
+        File dir = new File(avatarsPath);
+        if (!dir.exists()) dir.mkdirs();
+
+        try {
+            file.transferTo(new File(dir, fileName));
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Не удалось сохранить файл");
+        }
+        String url = "/avatars/" + fileName;
+        user.setAvatarUrl(url);
+        userRepository.save(user);
         return user;
     }
 }

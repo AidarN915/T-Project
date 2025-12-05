@@ -43,7 +43,9 @@ public class SecurityConfig {
                                 "/v3/api-docs",
                                 "/swagger-ui/**",
                                 "/ws-chat/**",
-                                "/error").permitAll()
+                                "/error",
+                                "/avatars/**",
+                                "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

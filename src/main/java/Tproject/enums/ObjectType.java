@@ -6,5 +6,6 @@ public enum ObjectType {
     TASK_LIST,
     TASK,
     COMMENT,
-    CHAT
+    CHAT,
+    TASKIMAGE
 }

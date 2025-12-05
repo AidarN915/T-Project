@@ -35,4 +35,7 @@ public class Task {
 
     @OneToOne(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
     private ChatRoom chatRoom;
+
+    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<TaskImage> taskImages;
 }

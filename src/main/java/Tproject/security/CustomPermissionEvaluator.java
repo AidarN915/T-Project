@@ -28,6 +28,7 @@ public class CustomPermissionEvaluator{
     private final ProjectsUsersRepository projectsUsersRepository;
     private final CommentRepository commentRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final TaskImageRepository taskImageRepository;
 
     public boolean hasAccess(Authentication auth, TargetIdentifier target) {
         if (auth == null || !auth.isAuthenticated() || target == null) {
@@ -77,6 +78,13 @@ public class CustomPermissionEvaluator{
                 ChatRoom chatRoom = chatRoomRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
                 return (chatRoom.getUsers().contains(user));
+            case TASKIMAGE:
+                project = taskImageRepository.findById(target.id())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
+                        .getTask()
+                        .getTaskList()
+                        .getBoard()
+                        .getProject();
             default:
                 return false;
         }

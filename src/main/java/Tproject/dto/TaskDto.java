@@ -1,9 +1,11 @@
 package Tproject.dto;
 
 
+import Tproject.model.TaskImage;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class TaskDto {
@@ -16,4 +18,5 @@ public class TaskDto {
     private UserDto executor;
     private UserDto creator;
     private Long chatRoomId;
+    private List<TaskImageDto> taskImages;
 }

@@ -22,5 +22,8 @@ public class Target {
     public static TargetIdentifier chat(Long id, OperationType type) {
         return new TargetIdentifier(ObjectType.CHAT, id,type);
     }
+    public static TargetIdentifier taskImage(Long id, OperationType type) {
+        return new TargetIdentifier(ObjectType.TASKIMAGE, id,type);
+    }
 
 }

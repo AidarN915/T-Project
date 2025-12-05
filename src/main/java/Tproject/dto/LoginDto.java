@@ -9,4 +9,5 @@ public class LoginDto {
     private String role;
     private String token;
     private String refreshToken;
+    private String avatarUrl;
 }

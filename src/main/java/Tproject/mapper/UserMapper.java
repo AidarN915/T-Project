@@ -20,6 +20,7 @@ public abstract class UserMapper {
         dto.setUsername(user.getUsername());
         dto.setRole(user.getRole());
         dto.setToken(jwt.getToken());
+        dto.setAvatarUrl(user.getAvatarUrl());
         dto.setRefreshToken(jwt.getRefreshToken());
         return dto;
     }

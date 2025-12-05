@@ -16,3 +16,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
+uploads:
+  avatars: /uploads/avatars/ #C:\Users\BoBr\Documents\uploads\avatars
+  images: /uploads/images/ #C:\Users\BoBr\Documents\uploads\images

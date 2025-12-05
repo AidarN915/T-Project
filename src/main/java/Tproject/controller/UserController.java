@@ -6,8 +6,11 @@ import Tproject.mapper.UserMapper;
 import Tproject.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,4 +31,18 @@ public class UserController {
                                            HttpServletRequest request){
         return ResponseEntity.ok(userMapper.toDto(userService.setRole(username,role,request)));
     }
+
+    @PostMapping("/update-name")
+    public ResponseEntity<UserDto> updateName(@RequestParam("username") String username,
+                                              Authentication auth){
+        return ResponseEntity.ok(userMapper.toDto(userService.updateName(username,auth)));
+    }
+
+    @PostMapping(value = "/upload-avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserDto> uploadAvatar(@RequestParam("file" )MultipartFile file,
+                                                Authentication auth){
+        return ResponseEntity.ok(userMapper.toDto(userService.uploadAvatar(file,auth)));
+    }
+
 }
