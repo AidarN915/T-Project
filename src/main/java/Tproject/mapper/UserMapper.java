@@ -16,6 +16,7 @@ public abstract class UserMapper {
     public abstract List<UserRoleDto> toListRoleDto(List<User> users);
     public LoginDto toLoginDto(User user, JwtDto jwt){
         LoginDto dto = new LoginDto();
+        dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setRole(user.getRole());
         dto.setToken(jwt.getToken());
