@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "chatmessages")
+@Table(name = "chat_messages")
 @ToString(onlyExplicitlyIncluded = true)
 public class ChatMessage {
     @Id
