@@ -3,6 +3,7 @@ package Tproject.service.Impl;
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.TaskCreateDto;
 import Tproject.dto.UserDto;
+import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
 import Tproject.model.*;
 import Tproject.repository.ChatRoomRepository;
@@ -69,8 +70,9 @@ public class TaskServiceImpl implements TaskService {
         chatRoom.setTask(newTask);
         chatRoom.setType("TASK");
         chatRoomRepository.save(chatRoom);
-        chatService.sendEventMessage(chatRoom.getId(),
+        chatService.sendMessage(chatRoom.getId(),
                 "Пользователь " + auth.getName() + " создал задачу",
+                MessageType.EVENT,
                 auth);
         for(ProjectsUsers userForNotify:chatRoom.getTask().getTaskList().getBoard().getProject().getProjectsUsers()){
             messagingTemplate.convertAndSend("/topic/user." + userForNotify.getUser().getId(),
