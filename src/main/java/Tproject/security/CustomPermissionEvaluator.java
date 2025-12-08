@@ -77,7 +77,8 @@ public class CustomPermissionEvaluator{
             case CHAT:
                 ChatRoom chatRoom = chatRoomRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
-                return (chatRoom.getUsers().contains(user));
+                boolean boll =(chatRoom.getUsers().contains(user));
+                return boll;
             case TASKIMAGE:
                 project = taskImageRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
