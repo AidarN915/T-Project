@@ -1,5 +1,6 @@
 package Tproject.service.Impl;
 
+import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
 import Tproject.model.Task;
 import Tproject.model.TaskImage;
@@ -81,8 +82,9 @@ public class TaskImageServiceImpl implements TaskImageService {
         taskImage.setTask(task);
         taskImageRepository.save(taskImage);
 
-        chatService.sendEventMessage(task.getChatRoom().getId(),
-                "Пользователь " + auth.getName() + " загрузил изображение",
+        chatService.sendMessage(task.getChatRoom().getId(),
+                url,
+                MessageType.FILE,
                 auth);
         return taskImage;
     }

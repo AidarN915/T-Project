@@ -73,14 +73,15 @@ public class ChatServiceImpl implements ChatService {
                                             newChat.getId());
                                     return newChat;
                                 }));
-        sendEventMessage(chatRoom.getId(),
+        sendMessage(chatRoom.getId(),
                 "Пользователь " + auth.getName() + " создал чат",
+                MessageType.EVENT,
                 auth);
         return chatRoom;
     }
 
     @Override
-    public ChatMessage sendMessage(Long chatRoomId, String text, Authentication auth) {
+    public ChatMessage sendMessage(Long chatRoomId, String text, MessageType messageType, Authentication auth) {
         if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.CHAT))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -88,25 +89,6 @@ public class ChatServiceImpl implements ChatService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Чат не найден"));
         ChatMessage message = new ChatMessage();
         message.setMessageType(MessageType.MESSAGE);
-        message.setText(text);
-        message.setSender(userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
-        message.setChatRoom(chatRoom);
-        chatMessageRepository.save(message);
-        messagingTemplate.convertAndSend(
-                "/topic/room."+chatRoom.getId(),
-                chatMessageMapper.toDto(message));
-        return message;
-    }
-    @Override
-    public ChatMessage sendEventMessage(Long chatRoomId, String text,Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.CHAT))){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
-        }
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Чат не найден"));
-        ChatMessage message = new ChatMessage();
-        message.setMessageType(MessageType.EVENT);
         message.setText(text);
         message.setSender(userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));

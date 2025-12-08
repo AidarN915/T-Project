@@ -3,6 +3,7 @@ package Tproject.controller;
 import Tproject.dto.ChatHistoryRequest;
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.SendMessageRequest;
+import Tproject.enums.MessageType;
 import Tproject.mapper.ChatMessageMapper;
 import Tproject.mapper.ChatRoomMapper;
 import Tproject.model.ChatMessage;
@@ -29,7 +30,7 @@ public class ChatWebSocketController {
     public void sendMessage(
             @Payload SendMessageRequest request,
             Authentication auth){
-        chatService.sendMessage(request.getChatRoomId(),request.getText(),auth);
+        chatService.sendMessage(request.getChatRoomId(),request.getText(), MessageType.MESSAGE,auth);
     }
 
     @MessageMapping("/chat.history")
