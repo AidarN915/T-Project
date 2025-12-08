@@ -2,6 +2,7 @@ package Tproject.service.Impl;
 
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.TaskCreateDto;
+import Tproject.dto.UserDto;
 import Tproject.enums.OperationType;
 import Tproject.model.*;
 import Tproject.repository.ChatRoomRepository;
@@ -23,6 +24,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -50,9 +52,12 @@ public class TaskServiceImpl implements TaskService {
 
         Task newTask = new Task();
         newTask.setTaskList(taskList);
-        if(createDto.getExecutor() != null) {
-            newTask.setExecutor(userRepository.findByUsername(createDto.getExecutor().getUsername())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден")));
+        if(createDto.getExecutors() != null && !createDto.getExecutors().isEmpty()) {
+            for(UserDto executorDto : createDto.getExecutors()){
+                User executor = userRepository.findByUsername(executorDto.getUsername())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден"));
+                newTask.getExecutors().add(executor);
+            }
         }
         newTask.setCreator(user);
         newTask.setDeadline(createDto.getDeadline());
@@ -63,16 +68,12 @@ public class TaskServiceImpl implements TaskService {
         ChatRoom chatRoom = new ChatRoom();
         chatRoom.setTask(newTask);
         chatRoom.setType("TASK");
-        chatRoom.setUsers(newTask.getTaskList().getBoard().
-                getProject().getProjectsUsers()
-                .stream().map(ProjectsUsers::getUser)
-                .collect(Collectors.toSet()));
         chatRoomRepository.save(chatRoom);
         chatService.sendEventMessage(chatRoom.getId(),
                 "Пользователь " + auth.getName() + " создал задачу",
                 auth);
-        for(User userForNotify:chatRoom.getUsers()){
-            messagingTemplate.convertAndSend("/topic/user." + userForNotify.getId(),
+        for(ProjectsUsers userForNotify:chatRoom.getTask().getTaskList().getBoard().getProject().getProjectsUsers()){
+            messagingTemplate.convertAndSend("/topic/user." + userForNotify.getUser().getId(),
                     chatRoom.getId());
         }
         newTask.setChatRoom(chatRoom);
@@ -99,13 +100,13 @@ public class TaskServiceImpl implements TaskService {
         if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-
-        if(createDto.getExecutor() != null) {
-            User executor = userRepository.findByUsername(createDto.getExecutor().getUsername())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден"));
-            task.setExecutor(executor);
-        }else{
-            task.setExecutor(null);
+        task.getExecutors().clear();
+        if(createDto.getExecutors() != null && !createDto.getExecutors().isEmpty()) {
+            for(UserDto executorDto:createDto.getExecutors()){
+                User executor = userRepository.findByUsername(executorDto.getUsername())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Исполнитель не найден"));
+                task.getExecutors().add(executor);
+            }
         }
         task.setTitle(createDto.getTitle());
         task.setDescription(createDto.getDescription());
@@ -163,6 +164,6 @@ public class TaskServiceImpl implements TaskService {
     public List<Task> getMyTasks(Authentication auth) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        return taskRepository.findByExecutor(user);
+        return taskRepository.findByExecutors(user);
     }
 }

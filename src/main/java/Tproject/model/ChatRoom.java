@@ -18,21 +18,13 @@ public class ChatRoom {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String type;//"TASK" or "USER"
+    private String type;
 
     @OneToOne
     @JoinColumn(name = "task_id")
     private Task task;
 
     private String chatRoomKey;
-
-    @ManyToMany
-    @JoinTable(
-            name = "users_chatrooms",
-            joinColumns = @JoinColumn(name = "chatroom_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id")
-    )
-    private Set<User> users = new HashSet<>();
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ChatMessage> messages = new ArrayList<>();

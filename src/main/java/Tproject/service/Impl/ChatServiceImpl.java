@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,10 +48,6 @@ public class ChatServiceImpl implements ChatService {
                    ChatRoom newChat = new ChatRoom();
                    newChat.setTask(task);
                    newChat.setType("TASK");
-                   newChat.setUsers(task.getTaskList().getBoard().
-                           getProject().getProjectsUsers()
-                           .stream().map(ProjectsUsers::getUser)
-                           .collect(Collectors.toSet()));
                    chatRoomRepository.save(newChat);
                    return newChat;
                 });
@@ -70,12 +68,6 @@ public class ChatServiceImpl implements ChatService {
                                     ChatRoom newChat = new ChatRoom();
                                     newChat.setChatRoomKey(auth.getName() + "_" + username);
                                     newChat.setType("USER");
-                                    Set<User> set = new HashSet<>();
-                                    set.add(userRepository.findByUsername(username)
-                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
-                                    set.add(userRepository.findByUsername(auth.getName())
-                                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
-                                    newChat.setUsers(new HashSet<>(set));
                                     chatRoomRepository.save(newChat);
                                     messagingTemplate.convertAndSend("/topic/user." + user.getId(),
                                             newChat.getId());
@@ -137,6 +129,10 @@ public class ChatServiceImpl implements ChatService {
     public List<ChatRoom> getAllMyChats(Authentication auth) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        return chatRoomRepository.findByUsers(user);
+        List<ChatRoom> taskChatRooms = chatRoomRepository.findChatRoomsAvailableForUser(user.getId());
+        List<ChatRoom> userChatRooms = chatRoomRepository.findAllByChatRoomKeyContaining(user.getUsername());
+        List<ChatRoom> allChatRoom = new ArrayList<>(taskChatRooms);
+        allChatRoom.addAll(userChatRooms);
+        return allChatRoom;
     }
 }

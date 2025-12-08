@@ -26,7 +26,7 @@ public class SwaggerConfig {
                                         .scheme("bearer")
                                         .bearerFormat("JWT")
                         )
-                )
-                .addServersItem(new Server().url("https://t-project-production.up.railway.app"));
+                );
+                //.addServersItem(new Server().url("https://t-project-production.up.railway.app"));
     }
 }

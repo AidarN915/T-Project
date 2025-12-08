@@ -77,7 +77,14 @@ public class CustomPermissionEvaluator{
             case CHAT:
                 ChatRoom chatRoom = chatRoomRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
-                return (chatRoom.getUsers().contains(user));
+                if(chatRoom.getTask() == null){
+                    return chatRoom.getChatRoomKey().contains(user.getUsername());
+                }
+                project = chatRoom.getTask()
+                        .getTaskList()
+                        .getBoard()
+                        .getProject();
+                break;
             case TASKIMAGE:
                 project = taskImageRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
@@ -85,13 +92,14 @@ public class CustomPermissionEvaluator{
                         .getTaskList()
                         .getBoard()
                         .getProject();
+                break;
             default:
                 return false;
         }
 
         return switch (target.opType()) {
             case OperationType.READ -> projectsUsersRepository.existsByUserAndProject(user,project);
-            case OperationType.CHANGE_STATUS -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.EXECUTOR);
+            case OperationType.CHANGE_STATUS -> (projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.EXECUTOR) || projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR));
             case OperationType.MODIFY -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR);
             default -> false;
         };

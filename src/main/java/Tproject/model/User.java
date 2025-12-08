@@ -36,9 +36,6 @@ public class User {
     @OneToMany(mappedBy = "commentator",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> comments;
 
-    @ManyToMany(mappedBy = "users")
-    private Set<ChatRoom> chatRooms = new HashSet<>();
-
     private String avatarUrl;
 
     @Override

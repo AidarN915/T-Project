@@ -15,7 +15,7 @@ public class TaskDto {
     private LocalDateTime created;
     private LocalDateTime deadline;
     private boolean isDone;
-    private UserDto executor;
+    private List<UserDto> executors;
     private UserDto creator;
     private Long chatRoomId;
     private List<TaskImageDto> taskImages;

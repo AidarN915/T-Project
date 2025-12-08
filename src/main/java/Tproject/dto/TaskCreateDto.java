@@ -5,11 +5,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class TaskCreateDto {
     private String title;
     private String description;
     private LocalDateTime deadline;
-    private UserDto executor;
+    private List<UserDto> executors;
 }
