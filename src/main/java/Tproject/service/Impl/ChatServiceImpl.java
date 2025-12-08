@@ -38,7 +38,7 @@ public class ChatServiceImpl implements ChatService {
     private final ChatMessageMapper chatMessageMapper;
     @Override
     public ChatRoom getTaskChatRoom(Long taskId, Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth, Target.task(taskId, OperationType.READ))){
+        if(!permissionEvaluator.hasAccess(auth, Target.task(taskId, OperationType.CHAT))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         Task task = taskRepository.findById(taskId)
@@ -81,7 +81,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public ChatMessage sendMessage(Long chatRoomId, String text, Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.MODIFY))){
+        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.CHAT))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
@@ -100,7 +100,7 @@ public class ChatServiceImpl implements ChatService {
     }
     @Override
     public ChatMessage sendEventMessage(Long chatRoomId, String text,Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.MODIFY))){
+        if(!permissionEvaluator.hasAccess(auth,Target.chat(chatRoomId,OperationType.CHAT))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)

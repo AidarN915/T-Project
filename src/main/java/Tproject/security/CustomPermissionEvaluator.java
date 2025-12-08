@@ -99,7 +99,7 @@ public class CustomPermissionEvaluator{
 
         return switch (target.opType()) {
             case OperationType.READ -> projectsUsersRepository.existsByUserAndProject(user,project);
-            case OperationType.CHANGE_STATUS -> (projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.EXECUTOR) || projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR));
+            case OperationType.CHANGE_STATUS, OperationType.CHAT -> (projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.EXECUTOR) || projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR));
             case OperationType.MODIFY -> projectsUsersRepository.existsByUserAndProjectAndRole(user,project, UserProjectRoles.MODERATOR);
             default -> false;
         };
