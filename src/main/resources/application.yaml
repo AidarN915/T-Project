@@ -5,9 +5,9 @@ jwt:
 
 spring:
   datasource: #jdbc:postgresql://postgres.railway.internal:5432/railway
-    url: jdbc:postgresql://localhost:5432/TodoTest #jdbc:postgresql://localhost:5432/TodoTest
+    url: jdbc:postgresql://postgres.railway.internal:5432/railway #jdbc:postgresql://localhost:5432/TodoTest
     username: postgres
-    password: 80085 #80085 #EECtbJuEldITiIfBBEIddigCmfvYutJf
+    password: EECtbJuEldITiIfBBEIddigCmfvYutJf #80085 #EECtbJuEldITiIfBBEIddigCmfvYutJf
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -17,5 +17,5 @@ spring:
       hibernate:
         format_sql: true
 uploads:
-  avatars: C:\Users\BoBr\Documents\uploads\avatars #/uploads/avatars/ #C:\Users\BoBr\Documents\uploads\avatars
-  images: C:\Users\BoBr\Documents\uploads\images #/uploads/images/ #C:\Users\BoBr\Documents\uploads\images
+  avatars: /uploads/avatars/ #/uploads/avatars/ #C:\Users\BoBr\Documents\uploads\avatars
+  images: /uploads/images/ #/uploads/images/ #C:\Users\BoBr\Documents\uploads\images
