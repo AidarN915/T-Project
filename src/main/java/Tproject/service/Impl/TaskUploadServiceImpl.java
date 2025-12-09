@@ -3,18 +3,17 @@ package Tproject.service.Impl;
 import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
 import Tproject.model.Task;
-import Tproject.model.TaskImage;
-import Tproject.repository.TaskImageRepository;
+import Tproject.model.TaskUpload;
+import Tproject.repository.TaskUploadRepository;
 import Tproject.repository.TaskRepository;
 import Tproject.repository.UserRepository;
 import Tproject.security.CustomPermissionEvaluator;
 import Tproject.security.Target;
 import Tproject.service.ChatService;
-import Tproject.service.TaskImageService;
+import Tproject.service.TaskUploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,35 +27,35 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class TaskImageServiceImpl implements TaskImageService {
+public class TaskUploadServiceImpl implements TaskUploadService {
     private final TaskRepository taskRepository;
-    private final TaskImageRepository taskImageRepository;
+    private final TaskUploadRepository taskUploadRepository;
     private final CustomPermissionEvaluator permissionEvaluator;
     private final ChatService chatService;
     private final UserRepository userRepository;
-    @Value("${uploads.images}")
-    private String imagesPath;
+    @Value("${uploads.files}")
+    private String filePath;
     @Override
-    public TaskImage getById(Long id, Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth, Target.taskImage(id, OperationType.READ))){
+    public TaskUpload getById(Long id, Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth, Target.taskUpload(id, OperationType.READ))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        return taskImageRepository.findById(id)
+        return taskUploadRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Изображение не найдено"));
     }
 
     @Override
-    public List<TaskImage> getByTask(Long taskId, Authentication auth) {
+    public List<TaskUpload> getByTask(Long taskId, Authentication auth) {
         if(!permissionEvaluator.hasAccess(auth,Target.task(taskId,OperationType.READ))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         return taskRepository.findById(taskId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"))
-                .getTaskImages();
+                .getTaskUploads();
     }
 
     @Override
-    public TaskImage upload(Long taskId,MultipartFile file, Authentication auth) {
+    public TaskUpload upload(Long taskId,MultipartFile file, Authentication auth) {
         if(!permissionEvaluator.hasAccess(auth,Target.task(taskId,OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -66,7 +65,7 @@ public class TaskImageServiceImpl implements TaskImageService {
         String ext = Objects.requireNonNull(file.getOriginalFilename())
                 .substring(file.getOriginalFilename().lastIndexOf("."));
         String fileName = task.getId() + "_" + UUID.randomUUID() + ext;
-        File dir = new File(imagesPath);
+        File dir = new File(filePath);
         if (!dir.exists()) dir.mkdirs();
 
 
@@ -76,27 +75,27 @@ public class TaskImageServiceImpl implements TaskImageService {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Не удалось сохранить файл");
         }
 
-        String url = "/images/" + fileName;
-        TaskImage taskImage = new TaskImage();
-        taskImage.setImageUrl(url);
-        taskImage.setTask(task);
-        taskImageRepository.save(taskImage);
+        String url = "/files/" + fileName;
+        TaskUpload taskUpload = new TaskUpload();
+        taskUpload.setUrl(url);
+        taskUpload.setTask(task);
+        taskUploadRepository.save(taskUpload);
 
         chatService.sendMessage(task.getChatRoom().getId(),
                 url,
                 MessageType.FILE,
                 auth);
-        return taskImage;
+        return taskUpload;
     }
 
     @Override
     public String delete(Long id, Authentication auth) {
-        if(!permissionEvaluator.hasAccess(auth,Target.taskImage(id,OperationType.MODIFY))){
+        if(!permissionEvaluator.hasAccess(auth,Target.taskUpload(id,OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        TaskImage taskImage = taskImageRepository.findById(id)
+        TaskUpload taskUpload = taskUploadRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Изображение на найдено"));
-        taskImageRepository.delete(taskImage);
+        taskUploadRepository.delete(taskUpload);
         return "Удалено";
     }
 }

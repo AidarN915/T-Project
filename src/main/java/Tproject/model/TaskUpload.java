@@ -6,14 +6,14 @@ import lombok.ToString;
 
 @Entity
 @Data
-@Table(name = "task_images")
+@Table(name = "task_uploads")
 @ToString(onlyExplicitlyIncluded = true)
-public class TaskImage {
+public class TaskUpload {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
+    private String url;
 
     @ManyToOne
     @JoinColumn(name = "task_id")

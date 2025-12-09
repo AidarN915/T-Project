@@ -7,5 +7,5 @@ public enum ObjectType {
     TASK,
     COMMENT,
     CHAT,
-    TASKIMAGE
+    TASK_UPLOAD
 }

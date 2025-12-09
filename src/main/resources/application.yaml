@@ -18,4 +18,4 @@ spring:
         format_sql: true
 uploads:
   avatars: /uploads/avatars/ #/uploads/avatars/ #C:\Users\BoBr\Documents\uploads\avatars
-  images: /uploads/images/ #/uploads/images/ #C:\Users\BoBr\Documents\uploads\images
+  files: /uploads/files/ #/uploads/files/ #C:\Users\BoBr\Documents\uploads\files

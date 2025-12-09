@@ -10,14 +10,14 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Value("${uploads.avatars}")
     private String avatarPath;
-    @Value("${uploads.images}")
-    private String imagePath;
+    @Value("${uploads.files}")
+    private String filePath;
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/avatars/**")
                 .addResourceLocations("file:" + avatarPath + "/");
-        registry.addResourceHandler("/images/**")
-                .addResourceLocations("file:" + imagePath + "/");
+        registry.addResourceHandler("/files/**")
+                .addResourceLocations("file:" + filePath + "/");
     }
 }

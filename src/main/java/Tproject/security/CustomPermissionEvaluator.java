@@ -1,20 +1,14 @@
 package Tproject.security;
 
-import Tproject.enums.ObjectType;
 import Tproject.enums.OperationType;
 import Tproject.enums.UserProjectRoles;
 import Tproject.model.*;
 import Tproject.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 @Component("permissionEvaluator")
 @RequiredArgsConstructor
@@ -28,7 +22,7 @@ public class CustomPermissionEvaluator{
     private final ProjectsUsersRepository projectsUsersRepository;
     private final CommentRepository commentRepository;
     private final ChatRoomRepository chatRoomRepository;
-    private final TaskImageRepository taskImageRepository;
+    private final TaskUploadRepository taskUploadRepository;
 
     public boolean hasAccess(Authentication auth, TargetIdentifier target) {
         if (auth == null || !auth.isAuthenticated() || target == null) {
@@ -85,8 +79,8 @@ public class CustomPermissionEvaluator{
                         .getBoard()
                         .getProject();
                 break;
-            case TASKIMAGE:
-                project = taskImageRepository.findById(target.id())
+            case TASK_UPLOAD:
+                project = taskUploadRepository.findById(target.id())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"))
                         .getTask()
                         .getTaskList()

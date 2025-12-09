@@ -45,7 +45,7 @@ public class SecurityConfig {
                                 "/ws-chat/**",
                                 "/error",
                                 "/avatars/**",
-                                "/images/**").permitAll()
+                                "/files/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

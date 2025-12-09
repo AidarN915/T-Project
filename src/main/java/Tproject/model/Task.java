@@ -41,5 +41,5 @@ public class Task {
     private ChatRoom chatRoom;
 
     @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<TaskImage> taskImages;
+    private List<TaskUpload> taskUploads;
 }
