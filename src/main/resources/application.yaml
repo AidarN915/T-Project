@@ -16,6 +16,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
 uploads:
   avatars: /uploads/avatars/ #/uploads/avatars/ #C:\Users\BoBr\Documents\uploads\avatars
   files: /uploads/files/ #/uploads/files/ #C:\Users\BoBr\Documents\uploads\files

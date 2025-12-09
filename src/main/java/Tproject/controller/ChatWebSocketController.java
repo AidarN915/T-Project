@@ -3,6 +3,7 @@ package Tproject.controller;
 import Tproject.dto.ChatHistoryRequest;
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.SendMessageRequest;
+import Tproject.dto.TypingDto;
 import Tproject.enums.MessageType;
 import Tproject.mapper.ChatMessageMapper;
 import Tproject.mapper.ChatRoomMapper;
@@ -43,6 +44,15 @@ public class ChatWebSocketController {
         messagingTemplate.convertAndSend(
                 "/topic/room." + request.getChatRoomId() + ".history",
                 messageDto
+        );
+    }
+    @MessageMapping("/chat.typing")
+    public void typing(
+            @Payload TypingDto request,
+            Authentication auth){
+        messagingTemplate.convertAndSend(
+                "/topic/room." + request.getChatRoomId() + ".typing",
+                request
         );
     }
 }
