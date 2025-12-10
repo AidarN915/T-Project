@@ -1,7 +1,8 @@
 package Tproject.controller;
 
+import Tproject.dto.LoginDto;
 import Tproject.dto.UserDto;
-import Tproject.dto.UserRoleDto;
+import Tproject.dto.UserListDto;
 import Tproject.mapper.UserMapper;
 import Tproject.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
     @GetMapping("/all")
-    public ResponseEntity<List<UserRoleDto>> getAll(){
+    public ResponseEntity<List<UserListDto>> getAll(){
         return ResponseEntity.ok(userMapper.toListRoleDto(userService.getAll()));
     }
 
@@ -33,9 +34,9 @@ public class UserController {
     }
 
     @PostMapping("/update-name")
-    public ResponseEntity<UserDto> updateName(@RequestParam("username") String username,
-                                              Authentication auth){
-        return ResponseEntity.ok(userMapper.toDto(userService.updateName(username,auth)));
+    public ResponseEntity<LoginDto> updateName(@RequestParam("username") String username,
+                                               Authentication auth){
+        return ResponseEntity.ok(userService.updateName(username,auth));
     }
 
     @PostMapping(value = "/upload-avatar",
@@ -45,4 +46,9 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toDto(userService.uploadAvatar(file,auth)));
     }
 
+    @PostMapping("/update-phone-number")
+    public ResponseEntity<UserDto> updatePhoneNumber(@RequestParam("phone") String phone,
+                                                     Authentication auth){
+        return ResponseEntity.ok(userMapper.toDto(userService.updatePhoneNumber(phone,auth)));
+    }
 }

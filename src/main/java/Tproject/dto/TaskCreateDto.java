@@ -12,5 +12,6 @@ public class TaskCreateDto {
     private String title;
     private String description;
     private LocalDateTime deadline;
-    private List<UserDto> executors;
+    private List<UserDtoRequest> executors;
+    private int priority;
 }

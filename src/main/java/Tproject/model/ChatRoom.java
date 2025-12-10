@@ -1,8 +1,8 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -10,12 +10,17 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true,
+callSuper = false)
 @Table(name = "chat_rooms")
 @ToString(onlyExplicitlyIncluded = true)
-public class ChatRoom {
+@Where(clause = "deleted = false")
+public class ChatRoom extends AuditableEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String type;

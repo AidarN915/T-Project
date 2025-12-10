@@ -99,7 +99,8 @@ public class BoardServiceImpl implements BoardService {
         Board board = boardRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Доска не найдена"));
 
-        boardRepository.delete(board);
+        board.markAsDeleted();
+        boardRepository.save(board);
         return "Удалено";
     }
 }

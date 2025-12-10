@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ProjectDto {
+public class ProjectDto extends AuditableDto {
     private Long id;
     private String title;
     private List<UserDto> viewers = new ArrayList<>();

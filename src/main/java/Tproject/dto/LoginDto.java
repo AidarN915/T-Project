@@ -10,4 +10,5 @@ public class LoginDto {
     private String token;
     private String refreshToken;
     private String avatarUrl;
+    private String phoneNumber;
 }

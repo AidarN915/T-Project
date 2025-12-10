@@ -3,6 +3,7 @@ package Tproject.service.Impl;
 import Tproject.dto.ChatMessageDto;
 import Tproject.dto.TaskCreateDto;
 import Tproject.dto.UserDto;
+import Tproject.dto.UserDtoRequest;
 import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
 import Tproject.model.*;
@@ -45,8 +46,6 @@ public class TaskServiceImpl implements TaskService {
     public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
-        User user = userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
         if(!permissionEvaluator.hasAccess(auth, Target.taskList(taskListId, OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
@@ -54,16 +53,16 @@ public class TaskServiceImpl implements TaskService {
         Task newTask = new Task();
         newTask.setTaskList(taskList);
         if(createDto.getExecutors() != null && !createDto.getExecutors().isEmpty()) {
-            for(UserDto executorDto : createDto.getExecutors()){
+            for(UserDtoRequest executorDto : createDto.getExecutors()){
                 User executor = userRepository.findByUsername(executorDto.getUsername())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Исполнитель не найден"));
                 newTask.getExecutors().add(executor);
             }
         }
-        newTask.setCreator(user);
         newTask.setDeadline(createDto.getDeadline());
         newTask.setDescription(createDto.getDescription());
         newTask.setTitle(createDto.getTitle());
+        newTask.setPriority(createDto.getPriority());
         taskRepository.save(newTask);
 
         ChatRoom chatRoom = new ChatRoom();
@@ -104,13 +103,14 @@ public class TaskServiceImpl implements TaskService {
         }
         task.getExecutors().clear();
         if(createDto.getExecutors() != null && !createDto.getExecutors().isEmpty()) {
-            for(UserDto executorDto:createDto.getExecutors()){
+            for(UserDtoRequest executorDto:createDto.getExecutors()){
                 User executor = userRepository.findByUsername(executorDto.getUsername())
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Исполнитель не найден"));
                 task.getExecutors().add(executor);
             }
         }
         task.setTitle(createDto.getTitle());
+        task.setPriority(createDto.getPriority());
         task.setDescription(createDto.getDescription());
         task.setDeadline(createDto.getDeadline());
         taskRepository.save(task);
@@ -150,8 +150,10 @@ public class TaskServiceImpl implements TaskService {
        if(!permissionEvaluator.hasAccess(auth,Target.task(id,OperationType.MODIFY))){
            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
        }
-        taskRepository.delete(task);
-        return "Удалено";
+       task.markAsDeleted();
+       task.getChatRoom().markAsDeleted();
+       taskRepository.save(task);
+       return "Удалено";
     }
 
     @Override

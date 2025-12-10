@@ -1,10 +1,7 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -14,10 +11,12 @@ import java.util.*;
 @Setter
 @Table(name = "users")
 @ToString(onlyExplicitlyIncluded = true)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(unique = true,nullable = false)
@@ -29,25 +28,10 @@ public class User {
     private String role = "USER";
     private String refreshToken;
     private LocalDateTime refreshTokenExpires;
+    private String phoneNumber;
 
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<ProjectsUsers> projectsUsers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "commentator",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<Comment> comments;
-
     private String avatarUrl;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }

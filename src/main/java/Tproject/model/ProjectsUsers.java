@@ -2,16 +2,17 @@ package Tproject.model;
 
 import Tproject.enums.UserProjectRoles;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "projects_users")
 @ToString(onlyExplicitlyIncluded = true)
 public class ProjectsUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @ManyToOne

@@ -73,8 +73,6 @@ public class CommentServiceImpl implements CommentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
         Comment comment = new Comment();
-        comment.setCommentator(userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
         comment.setTask(task);
         comment.setTitle(title);
         commentRepository.save(comment);
@@ -100,7 +98,8 @@ public class CommentServiceImpl implements CommentService {
         }
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Комментарий не найден"));
-        commentRepository.delete(comment);
+        comment.markAsDeleted();
+        commentRepository.save(comment);
         return "Удалено";
     }
 }

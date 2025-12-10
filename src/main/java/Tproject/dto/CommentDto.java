@@ -8,10 +8,8 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class CommentDto {
+public class CommentDto  extends AuditableDto {
     private Long id;
     private String title;
-    private UserDto commentator;
-    private LocalDateTime creationDate;
     private CommentStatus status;
 }

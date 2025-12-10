@@ -1,9 +1,14 @@
 package Tproject.service.Impl;
 
+import Tproject.dto.JwtDto;
+import Tproject.dto.LoginDto;
 import Tproject.dto.UserDto;
+import Tproject.mapper.UserMapper;
 import Tproject.model.User;
 import Tproject.repository.UserRepository;
 import Tproject.service.UserService;
+import Tproject.util.JwtUtil;
+import Tproject.util.RefreshTokenUtil;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -19,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,8 +34,16 @@ import java.util.UUID;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserUtil userUtil;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsServiceImpl userDetailsService;
+    private final UserMapper userMapper;
+
     @Value("${uploads.avatars}")
     private String avatarsPath;
+
+    @Value("${jwt.rtExpiration}")
+    private Integer refreshTokenExpiration;
+
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
@@ -52,16 +66,18 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     @Transactional
-    public User updateName(String username, Authentication auth){
+    public LoginDto updateName(String username, Authentication auth){
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        if(user.getUsername().equals(username)){
-            return user;
-        }
         if(userRepository.existsByUsername(username)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Данное имя пользователя занято");
         }
         user.setUsername(username);
+
+        String newRefreshToken = RefreshTokenUtil.generateRefreshToken();
+        user.setRefreshToken(newRefreshToken);
+        user.setRefreshTokenExpires(LocalDateTime.now().plusHours(refreshTokenExpiration));
+
         userRepository.save(user);
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(
@@ -71,6 +87,19 @@ public class UserServiceImpl implements UserService {
                 )
         );
 
+        String jwtToken = jwtUtil.generateToken(userDetailsService.loadUserByUsername(user.getUsername()));
+        JwtDto jwt = new JwtDto();
+        jwt.setToken(jwtToken);
+        jwt.setRefreshToken(newRefreshToken);
+        return userMapper.toLoginDto(user,jwt);
+    }
+
+    @Override
+    public User updatePhoneNumber(String phoneNumber, Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        user.setPhoneNumber(phoneNumber);
+        userRepository.save(user);
         return user;
     }
 

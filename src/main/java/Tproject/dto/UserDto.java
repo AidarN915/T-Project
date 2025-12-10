@@ -7,9 +7,5 @@ public class UserDto {
     private Long id;
     private String username;
     private String avatarUrl;
-    public UserDto(String username){
-        this.username = username;
-    }
-    public UserDto(){
-    }
+    private String phoneNumber;
 }

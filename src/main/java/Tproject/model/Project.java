@@ -1,10 +1,8 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,12 +11,16 @@ import java.util.Set;
 
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true
+,callSuper = false)
 @Entity
 @Table(name = "projects")
 @ToString(onlyExplicitlyIncluded = true)
-public class Project {
+@Where(clause = "deleted = false")
+public class Project extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)

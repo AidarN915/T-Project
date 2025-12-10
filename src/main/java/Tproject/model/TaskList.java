@@ -1,18 +1,24 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true,
+callSuper = false)
 @Table(name = "task_list")
 @ToString(onlyExplicitlyIncluded = true)
-public class TaskList {
+@Where(clause = "deleted = false")
+public class TaskList extends AuditableEntity
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     @Column(nullable = false)

@@ -74,7 +74,8 @@ public class TaskListServiceImpl implements TaskListService {
         if(!permissionEvaluator.hasAccess(auth,Target.taskList(taskListId,OperationType.MODIFY))){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
-        taskListRepository.delete(taskList);
+        taskList.markAsDeleted();
+        taskListRepository.save(taskList);
         return "Удалено";
     }
 }

@@ -1,9 +1,9 @@
 package Tproject.controller;
 
-import Tproject.dto.ChatHistoryRequest;
+import Tproject.dto.ws.ChatHistoryRequest;
 import Tproject.dto.ChatMessageDto;
-import Tproject.dto.SendMessageRequest;
-import Tproject.dto.TypingDto;
+import Tproject.dto.ws.SendMessageRequest;
+import Tproject.dto.ws.TypingDto;
 import Tproject.enums.MessageType;
 import Tproject.mapper.ChatMessageMapper;
 import Tproject.mapper.ChatRoomMapper;

@@ -2,6 +2,7 @@ package Tproject.service.Impl;
 
 import Tproject.dto.ProjectUpdateDto;
 import Tproject.dto.UserDto;
+import Tproject.dto.UserDtoRequest;
 import Tproject.enums.OperationType;
 import Tproject.enums.UserProjectRoles;
 import Tproject.model.Project;
@@ -106,11 +107,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
-        projectRepository.delete(project);
+        project.markAsDeleted();
+        projectRepository.save(project);
         return "Удалено";
     }
 
-    private void addUsersToProject(Project project, List<UserDto> dtos, UserProjectRoles role) {
+    private void addUsersToProject(Project project, List<UserDtoRequest> dtos, UserProjectRoles role) {
         if (dtos == null) return;
 
         List<ProjectsUsers> pus = dtos.stream()

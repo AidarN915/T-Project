@@ -21,10 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -90,8 +87,6 @@ public class ChatServiceImpl implements ChatService {
         ChatMessage message = new ChatMessage();
         message.setMessageType(MessageType.MESSAGE);
         message.setText(text);
-        message.setSender(userRepository.findByUsername(auth.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден")));
         message.setChatRoom(chatRoom);
         chatMessageRepository.save(message);
         messagingTemplate.convertAndSend(
@@ -104,7 +99,7 @@ public class ChatServiceImpl implements ChatService {
     public Page<ChatMessage> getChatMessages(Long chatRoomId, Pageable pageable, Authentication auth) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Чат не найден"));
-        return chatMessageRepository.findByChatRoomOrderByCreationDateDesc(chatRoom,pageable);
+        return chatMessageRepository.findByChatRoomOrderByCreatedDateDesc(chatRoom,pageable);
     }
 
     @Override

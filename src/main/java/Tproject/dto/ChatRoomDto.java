@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class ChatRoomDto {
+public class ChatRoomDto  extends AuditableDto {
     private Long id;
     private String type;//"TASK" or "USER"
 }

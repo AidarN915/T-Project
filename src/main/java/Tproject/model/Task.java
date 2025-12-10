@@ -1,8 +1,10 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -10,30 +12,39 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Data
+@Getter
+@Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true,
+callSuper = false)
 @Table(name = "tasks")
 @ToString(onlyExplicitlyIncluded = true)
-public class Task {
+@Where(clause = "deleted = false")
+public class Task extends AuditableEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String title;
     private String description;
-    private LocalDateTime created = LocalDateTime.now();
     private LocalDateTime deadline;
     private boolean isDone = false;
+
+    @Column(nullable = false)
+    @Min(0)
+    @Max(4)
+    private int priority;
+
     @ManyToMany
     @JoinTable(name = "tasks_executors",
     joinColumns = @JoinColumn(name = "task_id"),
     inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> executors = new HashSet<>();
-    @OneToOne
-    @JoinColumn(name = "creator_id")
-    private User creator;
+
     @ManyToOne
     @JoinColumn(name = "list_id")
     private TaskList taskList;
+
     @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> comments;
 

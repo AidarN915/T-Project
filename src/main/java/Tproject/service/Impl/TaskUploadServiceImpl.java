@@ -95,7 +95,8 @@ public class TaskUploadServiceImpl implements TaskUploadService {
         }
         TaskUpload taskUpload = taskUploadRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Изображение на найдено"));
-        taskUploadRepository.delete(taskUpload);
+        taskUpload.markAsDeleted();
+        taskUploadRepository.save(taskUpload);
         return "Удалено";
     }
 }

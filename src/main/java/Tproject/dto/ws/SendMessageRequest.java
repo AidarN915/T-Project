@@ -1,4 +1,4 @@
-package Tproject.dto;
+package Tproject.dto.ws;
 
 import lombok.Data;
 

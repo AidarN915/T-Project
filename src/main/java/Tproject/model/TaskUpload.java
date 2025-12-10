@@ -1,16 +1,21 @@
 package Tproject.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Entity
-@Data
+@Getter
+@Setter
 @Table(name = "task_uploads")
 @ToString(onlyExplicitlyIncluded = true)
-public class TaskUpload {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true,
+callSuper = false)
+@Where(clause = "deleted = false")
+public class TaskUpload extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String url;
