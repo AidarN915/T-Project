@@ -24,7 +24,7 @@ public class TaskList extends AuditableEntity
     @Column(nullable = false)
     private String title;
 
-    @OneToMany(mappedBy = "taskList",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "taskList",cascade = CascadeType.ALL)
     private List<Task> tasks;
 
     @ManyToOne

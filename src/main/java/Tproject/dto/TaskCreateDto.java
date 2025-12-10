@@ -14,4 +14,5 @@ public class TaskCreateDto {
     private LocalDateTime deadline;
     private List<UserDtoRequest> executors;
     private int priority;
+    private Long parentTaskId;
 }

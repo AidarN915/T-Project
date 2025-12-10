@@ -63,6 +63,11 @@ public class TaskServiceImpl implements TaskService {
         newTask.setDescription(createDto.getDescription());
         newTask.setTitle(createDto.getTitle());
         newTask.setPriority(createDto.getPriority());
+        if(createDto.getParentTaskId() != null){
+            Task parent = taskRepository.findById(createDto.getParentTaskId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Родительская задача не найдена"));
+            newTask.setParentTask(parent);
+        }
         taskRepository.save(newTask);
 
         ChatRoom chatRoom = new ChatRoom();
@@ -113,6 +118,12 @@ public class TaskServiceImpl implements TaskService {
         task.setPriority(createDto.getPriority());
         task.setDescription(createDto.getDescription());
         task.setDeadline(createDto.getDeadline());
+
+        if(createDto.getParentTaskId() != null){
+            Task parent = taskRepository.findById(createDto.getParentTaskId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Родительская задача не найдена"));
+            task.setParentTask(parent);
+        }
         taskRepository.save(task);
         return task;
     }

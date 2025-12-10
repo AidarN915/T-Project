@@ -7,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -45,12 +46,19 @@ public class Task extends AuditableEntity{
     @JoinColumn(name = "list_id")
     private TaskList taskList;
 
-    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL)
     private List<Comment> comments;
 
-    @OneToOne(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToOne(mappedBy = "task",cascade = CascadeType.ALL)
     private ChatRoom chatRoom;
 
-    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "task",cascade = CascadeType.ALL)
     private List<TaskUpload> taskUploads;
+
+    @ManyToOne
+    @JoinColumn(name = "parent_task_id")
+    private Task parentTask;
+
+    @OneToMany(mappedBy = "parentTask",cascade = CascadeType.ALL)
+    private List<Task> subtasks = new ArrayList<>();
 }

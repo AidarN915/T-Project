@@ -27,6 +27,6 @@ public class Board extends AuditableEntity{
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @OneToMany(mappedBy = "board",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "board",cascade = CascadeType.ALL)
     private List<TaskList> taskLists;
 }

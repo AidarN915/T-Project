@@ -17,4 +17,5 @@ public class TaskDto extends AuditableDto {
     private Long chatRoomId;
     private int priority;
     private List<TaskUploadDto> taskUploads;
+    private List<TaskDto> subtasks;
 }

@@ -9,7 +9,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring",uses = {UserMapper.class,TaskUploadMapper.class})
+@Mapper(componentModel = "spring",uses = {UserMapper.class,TaskUploadMapper.class, TaskMapper.class})
 public abstract class TaskMapper {
     abstract public TaskDto toDto(Task task);
     abstract public List<TaskDto> toListDto(List<Task> tasks);

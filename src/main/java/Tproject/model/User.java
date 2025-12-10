@@ -30,7 +30,7 @@ public class User {
     private LocalDateTime refreshTokenExpires;
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     private List<ProjectsUsers> projectsUsers = new ArrayList<>();
 
     private String avatarUrl;

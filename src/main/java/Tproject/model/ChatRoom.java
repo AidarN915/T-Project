@@ -31,7 +31,7 @@ public class ChatRoom extends AuditableEntity{
 
     private String chatRoomKey;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatMessage> messages = new ArrayList<>();
 
 }
