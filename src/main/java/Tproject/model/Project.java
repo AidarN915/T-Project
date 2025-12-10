@@ -29,6 +29,6 @@ public class Project extends AuditableEntity {
     @OneToMany(mappedBy = "project",cascade = CascadeType.ALL)
     private List<Board> boards = new ArrayList<>();
 
-    @OneToMany(mappedBy = "project",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectsUsers> projectsUsers = new ArrayList<>();
 }
