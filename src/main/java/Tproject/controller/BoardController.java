@@ -1,10 +1,8 @@
 package Tproject.controller;
 
 import Tproject.dto.BoardDto;
-import Tproject.dto.BoardUpdateDto;
 import Tproject.mapper.BoardMapper;
 import Tproject.service.BoardService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -37,9 +35,9 @@ public class BoardController {
     }
     @PostMapping("/update/{boardId}")
     public ResponseEntity<BoardDto> update(@PathVariable Long boardId,
-                                           @RequestBody BoardUpdateDto updateDto,
+                                           @RequestParam("title") String title,
                                            Authentication auth){
-        return ResponseEntity.ok(boardMapper.toDto(boardService.update(boardId,auth,updateDto)));
+        return ResponseEntity.ok(boardMapper.toDto(boardService.update(boardId,auth,title)));
     }
     @DeleteMapping("/delete/{boardId}")
     public ResponseEntity<String> delete(@PathVariable Long boardId,
