@@ -51,6 +51,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                                     username, null, new ArrayList<>()
                             );
                     accessor.setUser(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                     if(accessor.getDestination() != null && accessor.getDestination().startsWith("/topic/room")) {
                         String destination = accessor.getDestination();
                         assert destination != null;

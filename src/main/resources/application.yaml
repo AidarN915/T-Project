@@ -7,7 +7,7 @@ spring:
   datasource: #jdbc:postgresql://postgres.railway.internal:5432/railway
     url: jdbc:postgresql://postgres.railway.internal:5432/railway #jdbc:postgresql://localhost:5432/TodoTest
     username: postgres
-    password: EECtbJuEldITiIfBBEIddigCmfvYutJf #80085 #EECtbJuEldITiIfBBEIddigCmfvYutJf
+    password: qpmftBIzPAGEKJEcBbiPEKJkShblGNRq #80085 #qpmftBIzPAGEKJEcBbiPEKJkShblGNRq
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
