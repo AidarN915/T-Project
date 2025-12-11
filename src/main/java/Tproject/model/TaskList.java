@@ -12,7 +12,6 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Table(name = "task_list")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class TaskList extends AuditableEntity
 {

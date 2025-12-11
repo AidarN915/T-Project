@@ -15,7 +15,6 @@ import java.util.Set;
 ,callSuper = false)
 @Entity
 @Table(name = "projects")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class Project extends AuditableEntity {
     @Id

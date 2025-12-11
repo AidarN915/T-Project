@@ -8,7 +8,6 @@ import lombok.*;
 @Setter
 @Entity
 @Table(name = "projects_users")
-@ToString(onlyExplicitlyIncluded = true)
 public class ProjectsUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

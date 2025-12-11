@@ -8,7 +8,6 @@ import org.hibernate.annotations.Where;
 @Getter
 @Setter
 @Table(name = "task_uploads")
-@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Where(clause = "deleted = false")

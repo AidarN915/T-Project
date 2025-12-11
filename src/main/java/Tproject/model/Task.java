@@ -18,7 +18,6 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Table(name = "tasks")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class Task extends AuditableEntity{
     @Id

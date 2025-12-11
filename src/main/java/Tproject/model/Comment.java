@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 ,callSuper = false)
 @Entity
 @Table(name = "comments")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class Comment extends AuditableEntity {
     @Id

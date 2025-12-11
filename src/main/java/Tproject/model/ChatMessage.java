@@ -14,7 +14,6 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Table(name = "chat_messages")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class ChatMessage extends AuditableEntity{
     @Id

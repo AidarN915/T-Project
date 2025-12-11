@@ -10,7 +10,6 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "boards")
-@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Where(clause = "deleted = false")

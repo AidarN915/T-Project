@@ -15,7 +15,6 @@ import java.util.Set;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true,
 callSuper = false)
 @Table(name = "chat_rooms")
-@ToString(onlyExplicitlyIncluded = true)
 @Where(clause = "deleted = false")
 public class ChatRoom extends AuditableEntity{
     @Id

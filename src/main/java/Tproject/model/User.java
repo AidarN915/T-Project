@@ -10,7 +10,6 @@ import java.util.*;
 @Getter
 @Setter
 @Table(name = "users")
-@ToString(onlyExplicitlyIncluded = true)
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class User {
 
