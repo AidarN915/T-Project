@@ -85,7 +85,7 @@ public class ChatServiceImpl implements ChatService {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Чат не найден"));
         ChatMessage message = new ChatMessage();
-        message.setMessageType(MessageType.MESSAGE);
+        message.setMessageType(messageType);
         message.setText(text);
         message.setChatRoom(chatRoom);
         chatMessageRepository.save(message);

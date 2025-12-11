@@ -16,6 +16,7 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -50,6 +51,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                                     username, null, new ArrayList<>()
                             );
                     accessor.setUser(authentication);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                     if(accessor.getDestination() != null && accessor.getDestination().startsWith("/topic/room")) {
                         String destination = accessor.getDestination();
                         assert destination != null;
