@@ -50,6 +50,7 @@ public class ChatWebSocketController {
     public void typing(
             @Payload TypingDto request,
             Authentication auth){
+        request.setUsername(auth.getName());
         messagingTemplate.convertAndSend(
                 "/topic/room." + request.getChatRoomId() + ".typing",
                 request
