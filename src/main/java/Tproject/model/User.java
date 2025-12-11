@@ -26,7 +26,9 @@ public class User {
     private String password;
 
     private String role = "USER";
+    @Column(name = "refresh_token")
     private String refreshToken;
+    @Column(name = "refresh_token_expires")
     private LocalDateTime refreshTokenExpires;
     private String phoneNumber;
 
