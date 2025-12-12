@@ -24,6 +24,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashSet;
@@ -43,6 +44,7 @@ public class TaskServiceImpl implements TaskService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
     @Override
+    @Transactional
     public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
         TaskList taskList = taskListRepository.findById(taskListId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Список не найден"));
