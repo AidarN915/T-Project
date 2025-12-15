@@ -2,13 +2,12 @@ package Tproject.service.Impl;
 
 import Tproject.dto.JwtDto;
 import Tproject.dto.LoginDto;
-import Tproject.dto.UserDto;
 import Tproject.mapper.UserMapper;
 import Tproject.model.User;
 import Tproject.repository.UserRepository;
 import Tproject.service.UserService;
 import Tproject.util.JwtUtil;
-import Tproject.util.RefreshTokenUtil;
+import Tproject.util.GenerateTokenUtil;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -74,7 +73,7 @@ public class UserServiceImpl implements UserService {
         }
         user.setUsername(username);
 
-        String newRefreshToken = RefreshTokenUtil.generateRefreshToken();
+        String newRefreshToken = GenerateTokenUtil.generateRefreshToken();
         user.setRefreshToken(newRefreshToken);
         user.setRefreshTokenExpires(LocalDateTime.now().plusHours(refreshTokenExpiration));
 

@@ -1,6 +1,7 @@
 package Tproject.service;
 
 import Tproject.dto.ProjectDto;
+import Tproject.dto.ProjectInviteDto;
 import Tproject.dto.ProjectUpdateDto;
 import Tproject.model.Project;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,4 +15,6 @@ public interface ProjectService {
     public Project create(Authentication auth,String title);
     public Project update(Long projectId, Authentication auth, ProjectUpdateDto updateDto);
     public String delete(Long projectId,Authentication auth);
+    public String generateProjectInvite(Long projectId,ProjectInviteDto projectInviteDto,Authentication auth);
+    public Project acceptInvite(String token,Authentication auth);
 }

@@ -1,6 +1,7 @@
 package Tproject.controller;
 
 import Tproject.dto.ProjectDto;
+import Tproject.dto.ProjectInviteDto;
 import Tproject.dto.ProjectUpdateDto;
 import Tproject.mapper.ProjectMapper;
 import Tproject.service.ProjectService;
@@ -42,5 +43,18 @@ public class ProjectController {
     public ResponseEntity<String> delete(@PathVariable Long projectId,
                                          Authentication auth){
         return ResponseEntity.ok(projectService.delete(projectId,auth));
+    }
+
+    @PostMapping("/{projectId}/invites/generate/")
+    public ResponseEntity<String> generateToken(@PathVariable Long projectId,
+                                                @RequestBody ProjectInviteDto projectInviteDto,
+                                                Authentication auth){
+        return ResponseEntity.ok(projectService.generateProjectInvite(projectId,projectInviteDto,auth));
+    }
+
+    @PostMapping("/invite/accept")
+    public ResponseEntity<ProjectDto> acceptInvite(@RequestParam("token") String token,
+                                                   Authentication auth){
+        return ResponseEntity.ok(projectMapper.toDto(projectService.acceptInvite(token,auth)));
     }
 }

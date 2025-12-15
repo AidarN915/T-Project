@@ -1,31 +1,31 @@
 package Tproject.service.Impl;
 
+import Tproject.dto.ProjectInviteDto;
 import Tproject.dto.ProjectUpdateDto;
-import Tproject.dto.UserDto;
 import Tproject.dto.UserDtoRequest;
 import Tproject.enums.OperationType;
 import Tproject.enums.UserProjectRoles;
 import Tproject.model.Project;
+import Tproject.model.ProjectInvite;
 import Tproject.model.ProjectsUsers;
 import Tproject.model.User;
+import Tproject.repository.ProjectInviteRepository;
 import Tproject.repository.ProjectRepository;
 import Tproject.repository.ProjectsUsersRepository;
 import Tproject.repository.UserRepository;
 import Tproject.security.CustomPermissionEvaluator;
 import Tproject.security.Target;
 import Tproject.service.ProjectService;
-import Tproject.util.UserUtil;
-import jakarta.servlet.http.HttpServletRequest;
+import Tproject.util.GenerateTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -35,6 +35,7 @@ public class ProjectServiceImpl implements ProjectService {
     private final UserRepository userRepository;
     private final CustomPermissionEvaluator permissionEvaluator;
     private final ProjectsUsersRepository projectsUsersRepository;
+    private final ProjectInviteRepository projectInviteRepository;
 
     @Override
     public Project getById(Long id, Authentication auth) {
@@ -110,6 +111,55 @@ public class ProjectServiceImpl implements ProjectService {
         project.markAsDeleted();
         projectRepository.save(project);
         return "Удалено";
+    }
+
+    @Override
+    public String generateProjectInvite(Long projectId,ProjectInviteDto projectInviteDto, Authentication auth) {
+        if(!permissionEvaluator.hasAccess(auth,Target.project(projectId, OperationType.MODIFY))){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
+        ProjectInvite projectInvite = new ProjectInvite();
+        if(projectInviteDto.getExpireHours() != null){
+            projectInvite.setExpiresAt(LocalDateTime.now().plusHours(projectInviteDto.getExpireHours()));
+        }
+        if(projectInviteDto.getCountOfUses() != null){
+            projectInvite.setCount(projectInviteDto.getCountOfUses());
+        }
+        projectInvite.setRole(projectInviteDto.getRole());
+        Project project = projectRepository.findById(projectId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
+        projectInvite.setProject(project);
+        String token = GenerateTokenUtil.generateInviteToken();
+        projectInvite.setToken(token);
+        projectInviteRepository.save(projectInvite);
+        return token;
+    }
+
+    @Override
+    @Transactional
+    public Project acceptInvite(String token, Authentication auth) {
+        ProjectInvite projectInvite = projectInviteRepository.findByToken(token)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Приглашение не найдено"));
+        if(projectInvite.getCount() != null && projectInvite.getCount() < 1){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Количество использований закончилось");
+        }
+        if(projectInvite.getExpiresAt() != null && projectInvite.getExpiresAt().isBefore(LocalDateTime.now())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Приглашение более не действительно");
+        }
+        User user = userRepository.findByUsername(auth.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
+        ProjectsUsers pu = new ProjectsUsers();
+        if(projectsUsersRepository.existsByUserAndProject(user,projectInvite.getProject())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Вы уже участвуете в этом проекте");
+        }
+        pu.setRole(projectInvite.getRole());
+        pu.setProject(projectInvite.getProject());
+        pu.setUser(user);
+        if (projectInvite.getCount() != null) {
+            projectInvite.setCount(projectInvite.getCount() - 1);
+        }
+        projectsUsersRepository.save(pu);
+        return projectInvite.getProject();
     }
 
     private void addUsersToProject(Project project, List<UserDtoRequest> dtos, UserProjectRoles role) {

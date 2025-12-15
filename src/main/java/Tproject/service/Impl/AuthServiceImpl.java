@@ -8,7 +8,7 @@ import Tproject.model.User;
 import Tproject.repository.UserRepository;
 import Tproject.service.AuthService;
 import Tproject.util.JwtUtil;
-import Tproject.util.RefreshTokenUtil;
+import Tproject.util.GenerateTokenUtil;
 import Tproject.util.UserUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
         if(user.getRefreshTokenExpires().isBefore(LocalDateTime.now())){
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
         }
-        String newRefreshToken = RefreshTokenUtil.generateRefreshToken();
+        String newRefreshToken = GenerateTokenUtil.generateRefreshToken();
         user.setRefreshToken(newRefreshToken);
         user.setRefreshTokenExpires(LocalDateTime.now().plusHours(refreshTokenExpiration));
         userRepository.save(user);
@@ -71,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
             authDto.getPassword()
         ));
         UserDetails userDetails = userDetailsService.loadUserByUsername(authDto.getUsername());
-        String refreshToken = RefreshTokenUtil.generateRefreshToken();
+        String refreshToken = GenerateTokenUtil.generateRefreshToken();
         String token = jwtUtil.generateToken(userDetails);
 
         User user = userRepository.findByUsername(authDto.getUsername())
