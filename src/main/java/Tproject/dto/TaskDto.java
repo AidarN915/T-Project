@@ -21,4 +21,5 @@ public class TaskDto extends AuditableDto {
     private int priority;
     private List<TaskUploadDto> taskUploads;
     private List<TaskDto> subtasks;
+    private Long parentTaskId;
 }
