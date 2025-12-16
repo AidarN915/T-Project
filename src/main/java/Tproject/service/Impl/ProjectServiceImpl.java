@@ -5,10 +5,7 @@ import Tproject.dto.ProjectUpdateDto;
 import Tproject.dto.UserDtoRequest;
 import Tproject.enums.OperationType;
 import Tproject.enums.UserProjectRoles;
-import Tproject.model.Project;
-import Tproject.model.ProjectInvite;
-import Tproject.model.ProjectsUsers;
-import Tproject.model.User;
+import Tproject.model.*;
 import Tproject.repository.ProjectInviteRepository;
 import Tproject.repository.ProjectRepository;
 import Tproject.repository.ProjectsUsersRepository;
@@ -58,13 +55,24 @@ public class ProjectServiceImpl implements ProjectService {
                     .findByUser(user)
                     .stream()
                     .map(ProjectsUsers::getProject).distinct().toList();
-            projects.forEach(project ->
-                    project.getBoards().forEach(board ->
-                            board.getTaskLists().forEach(taskList ->
-                                    taskList.getTasks().removeIf(task -> task.getParentTask() != null)
-                            )
-                    )
-            );
+            projects.forEach(project -> {
+                if (project.getBoards() != null) {
+                    project.getBoards().forEach(board -> {
+                        if (board.getTaskLists() != null) {
+                            board.getTaskLists().forEach(taskList -> {
+                                if (taskList.getTasks() != null) {
+                                    List<Task> filteredTasks = taskList.getTasks()
+                                            .stream()
+                                            .filter(task -> task.getParentTask() == null)
+                                            .toList();
+                                    taskList.setTasks(filteredTasks);
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+
             return projects;
         }
     }
