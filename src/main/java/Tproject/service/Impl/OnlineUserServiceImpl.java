@@ -16,13 +16,11 @@ public class OnlineUserServiceImpl implements OnlineUserService {
     @Override
     public void addOnline(String username) {
         onlineUsers.add(username);
-        sendOnlineUsers();
     }
 
     @Override
     public void removeOnline(String username) {
         onlineUsers.remove(username);
-        sendOnlineUsers();
     }
 
     @Override

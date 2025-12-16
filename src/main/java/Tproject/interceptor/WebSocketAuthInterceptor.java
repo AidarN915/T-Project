@@ -4,6 +4,7 @@ import Tproject.model.ChatRoom;
 import Tproject.model.User;
 import Tproject.repository.ChatRoomRepository;
 import Tproject.repository.UserRepository;
+import Tproject.service.OnlineUserService;
 import Tproject.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
+    private final OnlineUserService onlineUserService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -63,7 +65,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                             throw new MessagingException("Доступ запрещён");
                         }
                     }
-                    if(accessor.getDestination() != null && accessor.getDestination().startsWith("/topic/user")){
+                    if(accessor.getDestination() != null && accessor.getDestination().startsWith("/topic/user.")){
                         String destination = accessor.getDestination();
                         assert destination != null;
                         var temp = destination.split("\\.");
@@ -74,6 +76,9 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                                 .orElseThrow(() -> new MessagingException("Пользователь не найден")).getId())){
                             throw new MessagingException("Нельзя подписываться на чужой топик");
                         }
+                    }
+                    if(accessor.getDestination() != null && accessor.getDestination().equals("/topic/users.online")){
+                        onlineUserService.sendOnlineUsers();
                     }
                 }
             }
