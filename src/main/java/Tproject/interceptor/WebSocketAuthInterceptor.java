@@ -30,7 +30,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private final JwtUtil jwtUtil;
     private final ChatRoomRepository chatRoomRepository;
     private final UserRepository userRepository;
-    private final OnlineUserService onlineUserService;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -76,9 +75,6 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                                 .orElseThrow(() -> new MessagingException("Пользователь не найден")).getId())){
                             throw new MessagingException("Нельзя подписываться на чужой топик");
                         }
-                    }
-                    if(accessor.getDestination() != null && accessor.getDestination().equals("/topic/users.online")){
-                        onlineUserService.sendOnlineUsers();
                     }
                 }
             }

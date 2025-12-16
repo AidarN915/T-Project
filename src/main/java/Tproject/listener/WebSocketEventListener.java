@@ -22,6 +22,9 @@ public class WebSocketEventListener {
             String username = accessor.getUser().getName();
             onlineUserService.addOnline(username);
         }
+        if ("/topic/users.online".equals(accessor.getDestination())) {
+            onlineUserService.sendOnlineUsers();
+        }
     }
 
     @EventListener
@@ -30,6 +33,7 @@ public class WebSocketEventListener {
         if (event.getUser() != null) {
             String username = event.getUser().getName();
             onlineUserService.removeOnline(username);
+            onlineUserService.sendOnlineUsers();
         }
     }
 }
