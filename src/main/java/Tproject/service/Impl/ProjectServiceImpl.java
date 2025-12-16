@@ -41,8 +41,24 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN);
         }
 
-        return projectRepository.findById(id)
+        Project project = projectRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Проект не найден"));
+        if(project.getBoards() != null){
+            project.getBoards().forEach(board -> {
+                if (board.getTaskLists() != null) {
+                    board.getTaskLists().forEach(taskList -> {
+                        if (taskList.getTasks() != null) {
+                            List<Task> filteredTasks = taskList.getTasks()
+                                    .stream()
+                                    .filter(task -> task.getParentTask() == null)
+                                    .toList();
+                            taskList.setTasks(filteredTasks);
+                        }
+                    });
+                }
+            });
+        }
+        return project;
     }
 
     @Override
