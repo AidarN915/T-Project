@@ -1,9 +1,11 @@
 package Tproject.service.Impl;
 
-import Tproject.dto.*;
+import Tproject.dto.ChatMessageDto;
+import Tproject.dto.TaskCreateDto;
+import Tproject.dto.UserDto;
+import Tproject.dto.UserDtoRequest;
 import Tproject.enums.MessageType;
 import Tproject.enums.OperationType;
-import Tproject.mapper.TaskMapper;
 import Tproject.model.*;
 import Tproject.repository.ChatRoomRepository;
 import Tproject.repository.TaskListRepository;
@@ -41,7 +43,6 @@ public class TaskServiceImpl implements TaskService {
     private final SimpMessagingTemplate messagingTemplate;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatService chatService;
-    private final TaskMapper taskMapper;
     @Override
     @Transactional
     public Task create(Long taskListId, TaskCreateDto createDto, Authentication auth) {
@@ -178,13 +179,9 @@ public class TaskServiceImpl implements TaskService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Задача не найдена"));
     }
     @Override
-    public List<TaskDto> getMyTasks(Authentication auth) {
+    public List<Task> getMyTasks(Authentication auth) {
         User user = userRepository.findByUsername(auth.getName())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Пользователь не найден"));
-        List<Task> tasks = taskRepository.findByExecutors(user);
-
-        return tasks.stream()
-                .map(taskMapper::toDto)
-                .toList();
+        return taskRepository.findByExecutors(user);
     }
 }

@@ -19,14 +19,5 @@ public abstract class TaskMapper {
         if (task.getChatRoom() != null) {
             dto.setChatRoomId(task.getChatRoom().getId());
         }
-        if(task.getParentTask() != null){
-            dto.setParentTaskId(task.getParentTask().getId());
-        }
-    }
-
-    @AfterMapping
-    protected void postProcessList(List<Task> source,
-                                   @MappingTarget List<TaskDto> target) {
-        target.removeIf(dto -> dto.getParentTaskId() != null);
     }
 }

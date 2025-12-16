@@ -54,10 +54,18 @@ public class ProjectServiceImpl implements ProjectService {
         if(user.getRole().equals("SUPERADMIN") || user.getRole().equals("ADMIN")) {
             return projectRepository.findAll();
         }else {
-            return projectsUsersRepository
+            List<Project> projects = projectsUsersRepository
                     .findByUser(user)
                     .stream()
-                    .map(ProjectsUsers::getProject).distinct().collect(Collectors.toList());
+                    .map(ProjectsUsers::getProject).distinct().toList();
+            projects.forEach(project ->
+                    project.getBoards().forEach(board ->
+                            board.getTaskLists().forEach(taskList ->
+                                    taskList.getTasks().removeIf(task -> task.getParentTask() != null)
+                            )
+                    )
+            );
+            return projects;
         }
     }
 

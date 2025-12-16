@@ -14,5 +14,5 @@ public interface TaskService {
     public Task changeStatus(Long id,boolean isDone,Authentication auth);
     public String deleteTask(Long id,Authentication auth);
     public Task getById(Long id,Authentication auth);
-    public List<TaskDto> getMyTasks(Authentication auth);
+    public List<Task> getMyTasks(Authentication auth);
 }
