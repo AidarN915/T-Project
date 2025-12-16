@@ -23,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -54,7 +55,11 @@ public class ProjectServiceImpl implements ProjectService {
             List<Project> projects = projectsUsersRepository
                     .findByUser(user)
                     .stream()
-                    .map(ProjectsUsers::getProject).distinct().toList();
+                    .map(ProjectsUsers::getProject)
+                    .filter(Objects::nonNull) // <- фильтруем null
+                    .distinct()
+                    .toList();
+
             projects.forEach(project -> {
                 if (project.getBoards() != null) {
                     project.getBoards().forEach(board -> {
